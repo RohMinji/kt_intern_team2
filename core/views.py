@@ -33,7 +33,6 @@ class VideoCamera(object):
         threading.Thread(target=self.update, args=()).start()
 
     def add_overlays(self, image):
-        # image = imutils.resize(image, width=400)
         grayImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         faces = faceDetector(grayImage, 0)
 
