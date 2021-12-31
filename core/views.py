@@ -1,56 +1,92 @@
-from django.shortcuts import render
-from django.views.decorators import gzip
-from django.http import StreamingHttpResponse
+
 import cv2
 import threading
 import dlib
 import numpy as np
-import imutils
 from imutils import face_utils
 from scipy.spatial import distance as dist
-from imutils import face_utils
-from scipy.spatial import distance as dist
-import numpy as np
 
+# Tensorflow
+from tensorflow.keras.models import load_model
+from tensorflow.keras.applications.resnet50 import preprocess_input
+from tensorflow.keras.preprocessing.image import img_to_array
+
+# Django
+from django.shortcuts import render
+from django.views.decorators import gzip
+from django.http import StreamingHttpResponse
  
-predictor = "shape_predictor_68_face_landmarks.dat"  
-MINIMUM_EAR = 0.2
-MAXIMUM_FRAME_COUNT = 5
-EYE_CLOSED_COUNTER = 0
-BLINK_COUNT = 0
-YAWN_COUNTER = 0
-yawn_status = False 
-
 
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #랜드마크 추출
 detector = dlib.get_frontal_face_detector() # 얼굴인식
-#landmarkFinder = dlib.shape_predictor(predictor)
-
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rightEyeStart, rightEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-        
 MINIMUM_EAR = 0.2
 MAXIMUM_FRAME_COUNT = 3
 EYE_CLOSED_COUNTER=0
 BLINK_COUNT=0
 YAWN_COUNTER = 0
-yawn_status = False
+YAWN_STATUS = False
 
-class VideoCamera(object):
-    
+# Face Detection Model
+model = load_model('face_detection/keras_model.h5', compile=False)
+model.summary()
 
-
-    
+# Index Page Cam Load
+class FaceCamera(object):
     def __init__(self):
         self.video = cv2.VideoCapture(0)
         (self.grabbed, self.frame) = self.video.read()
         threading.Thread(target=self.update, args=()).start()
 
+    def add_overlays(self, image):
+        webcam = self.video
+        web_frame = image
+    
+        if not webcam.isOpened():
+            print("Could not open webcam")
+            exit()
+        
+        # loop through frames
+        img = cv2.resize(web_frame, (224, 224), interpolation = cv2.INTER_AREA)
+        x = img_to_array(img)
+        x = np.expand_dims(x, axis=0)
+        x = preprocess_input(x)
+    
+        prediction = model.predict(x)
+        predicted_class = np.argmax(prediction[0]) # 예측된 클래스 0, 1, 2
+        
+        if predicted_class == 0:
+            me = "안녕하세요 승용님, 학습을 시작하겠습니다."
+        elif predicted_class == 1:
+            me = "교육생이 아닙니다."        
+        elif predicted_class == 2:
+            me = ""
+        print("predicted_class", predicted_class)
+
+    def get_frame(self):
+        image = self.frame
+        self.add_overlays(image)
+        # jpeg encoding
+        _, jpeg = cv2.imencode('.jpg', image)
+        return jpeg.tobytes()
+
+    def update(self):
+        while True:
+            (self.grabbed, self.frame) = self.video.read()
+
+
+# Course Page Cam Load
+class VideoCamera(object):
+
+    def __init__(self):
+        self.video = cv2.VideoCapture(0)
+        (self.grabbed, self.frame) = self.video.read()
+        threading.Thread(target=self.update, args=()).start()
 
     def add_overlays(self, image):
-        # image = imutils.resize(image, width=400)
-        global yawn_status
+        global YAWN_STATUS
         global grayImage
         global BLINK_COUNT
         global YAWN_COUNTER
@@ -77,9 +113,9 @@ class VideoCamera(object):
                 BLINK_COUNT += 1
                 cv2.putText(image, "Count: {}".format(int((BLINK_COUNT)/5)), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
         
-        prev_yawn_status = yawn_status
+        prev_yawn_status = YAWN_STATUS
         if lip_distance>25:
-            yawn_status = True 
+            YAWN_STATUS = True 
         #cv2.putText(frame, "Subject is Yawning", (50,450), 
         #           cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
         
@@ -88,9 +124,9 @@ class VideoCamera(object):
             cv2.putText(image, output_text, (50,50),
                     cv2.FONT_HERSHEY_COMPLEX, 1,(0,255,127),2)
         else:
-            yawn_status = False 
+            YAWN_STATUS = False 
          
-        if prev_yawn_status == True and yawn_status == False:
+        if prev_yawn_status == True and YAWN_STATUS == False:
             YAWN_COUNTER += 1
     
 
@@ -125,7 +161,6 @@ def get_landmarks(im):
 
 
 def eye_aspect_ratio(eye):
-    
     p2_minus_p6 = dist.euclidean(eye[1], eye[5])
     p3_minus_p5 = dist.euclidean(eye[2], eye[4])
     p1_minus_p4 = dist.euclidean(eye[0], eye[3])
@@ -176,13 +211,8 @@ def mouth_open(imagee):
     lip_distance = abs(top_lip_center - bottom_lip_center)
     return image_with_landmarks, lip_distance
 
-    #cv2.imshow('Result', image_with_landmarks)
-    #cv2.imwrite('image_with_landmarks.jpg',image_with_landmarks)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
 
 def calEAR(face):
-    
     faceLandmarks = predictor(grayImage, face)
     faceLandmarks = face_utils.shape_to_np(faceLandmarks)
 
@@ -202,13 +232,7 @@ def calEAR(face):
     
     return ear
 
-# while True:
-#     # (status, image) = webcamFeed.read()
-    
 
-#     cv2.imshow("Frame", image)
-#     if cv2.waitKey(1) == 13: #13 is the Enter Key
-#         break
 
 def index(request):
     return render(request, "core/index.html")
@@ -217,6 +241,16 @@ def index(request):
 def cam_test(request):
     try:
         cam = VideoCamera()
+        return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+    except:  # This is bad! replace it with proper handling
+        print("Error")
+        pass
+
+
+@gzip.gzip_page
+def face_detection(request):
+    try:
+        cam = FaceCamera()
         return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
     except:  # This is bad! replace it with proper handling
         print("Error")
