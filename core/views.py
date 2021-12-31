@@ -6,15 +6,14 @@ import numpy as np
 from imutils import face_utils
 from scipy.spatial import distance as dist
 
-# Tensorflow
-from tensorflow.keras.models import load_model
-from tensorflow.keras.applications.resnet50 import preprocess_input
-from tensorflow.keras.preprocessing.image import img_to_array
-
 # Django
 from django.shortcuts import render
 from django.views.decorators import gzip
 from django.http import StreamingHttpResponse
+
+# Model
+from models.face_detection import face_detect
+from models.pose_detection import pose_detect
  
 
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #랜드마크 추출
@@ -29,9 +28,6 @@ BLINK_COUNT=0
 YAWN_COUNTER = 0
 YAWN_STATUS = False
 
-# Face Detection Model
-model = load_model('face_detection/keras_model.h5', compile=False)
-model.summary()
 
 # Index Page Cam Load
 class FaceCamera(object):
@@ -40,35 +36,10 @@ class FaceCamera(object):
         (self.grabbed, self.frame) = self.video.read()
         threading.Thread(target=self.update, args=()).start()
 
-    def add_overlays(self, image):
-        webcam = self.video
-        web_frame = image
-    
-        if not webcam.isOpened():
-            print("Could not open webcam")
-            exit()
-        
-        # loop through frames
-        img = cv2.resize(web_frame, (224, 224), interpolation = cv2.INTER_AREA)
-        x = img_to_array(img)
-        x = np.expand_dims(x, axis=0)
-        x = preprocess_input(x)
-    
-        prediction = model.predict(x)
-        predicted_class = np.argmax(prediction[0]) # 예측된 클래스 0, 1, 2
-        
-        if predicted_class == 0:
-            me = "안녕하세요 승용님, 학습을 시작하겠습니다."
-        elif predicted_class == 1:
-            me = "교육생이 아닙니다."        
-        elif predicted_class == 2:
-            me = ""
-        print("predicted_class", predicted_class)
-
     def get_frame(self):
         image = self.frame
-        self.add_overlays(image)
-        # jpeg encoding
+        cam = self.video
+        face_detect(cam, image) # model function
         _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
 
@@ -135,6 +106,26 @@ class VideoCamera(object):
         image = self.frame
         self.add_overlays(image)
         # jpeg encoding
+        _, jpeg = cv2.imencode('.jpg', image)
+        return jpeg.tobytes()
+
+    def update(self):
+        while True:
+            (self.grabbed, self.frame) = self.video.read()
+
+
+
+
+class PoseCamera(object):
+    def __init__(self):
+        self.video = cv2.VideoCapture(0)
+        (self.grabbed, self.frame) = self.video.read()
+        threading.Thread(target=self.update, args=()).start()
+    
+    def get_frame(self):
+        image = self.frame
+        cam = self.video
+        pose_detect(cam, image) # model function
         _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
 
@@ -211,7 +202,6 @@ def mouth_open(imagee):
     lip_distance = abs(top_lip_center - bottom_lip_center)
     return image_with_landmarks, lip_distance
 
-
 def calEAR(face):
     faceLandmarks = predictor(grayImage, face)
     faceLandmarks = face_utils.shape_to_np(faceLandmarks)
@@ -232,7 +222,13 @@ def calEAR(face):
     
     return ear
 
+# while True:
+#     # (status, image) = webcamFeed.read()
+    
 
+#     cv2.imshow("Frame", image)
+#     if cv2.waitKey(1) == 13: #13 is the Enter Key
+#         break
 
 def index(request):
     return render(request, "core/index.html")
@@ -242,7 +238,7 @@ def cam_test(request):
     try:
         cam = VideoCamera()
         return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-    except:  # This is bad! replace it with proper handling
+    except:
         print("Error")
         pass
 
@@ -252,6 +248,15 @@ def face_detection(request):
     try:
         cam = FaceCamera()
         return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
-    except:  # This is bad! replace it with proper handling
+    except:
+        print("Error")
+        pass
+
+@gzip.gzip_page
+def pose_detection(request):
+    try:
+        cam = PoseCamera()
+        return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+    except:
         print("Error")
         pass
