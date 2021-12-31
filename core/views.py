@@ -21,13 +21,14 @@ predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #랜�
 detector = dlib.get_frontal_face_detector() # 얼굴인식
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rightEyeStart, rightEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
-
+#할거=본인인증카운트해서 다음기능넘어가는
 MINIMUM_EAR = 0.2
 MAXIMUM_FRAME_COUNT = 3
 EYE_CLOSED_COUNTER=0
 BLINK_COUNT=0
 YAWN_COUNTER = 0
 YAWN_STATUS = False
+SY_COUNT = 0
 
 # Face Detection Model
 model = load_model('face_detection/keras_model.h5', compile=False)
@@ -41,6 +42,8 @@ class FaceCamera(object):
         threading.Thread(target=self.update, args=()).start()
 
     def add_overlays(self, image):
+        global SY_COUNT
+
         webcam = self.video
         web_frame = image
     
@@ -59,8 +62,15 @@ class FaceCamera(object):
         
         if predicted_class == 0:
             me = "안녕하세요 승용님, 학습을 시작하겠습니다."
+            
+            if SY_COUNT > 30:
+                print("next")
         elif predicted_class == 1:
-            me = "교육생이 아닙니다."        
+            me = "교육생이 아닙니다."
+            SY_COUNT += 1
+            if SY_COUNT > 100:
+                print("next")
+            
         elif predicted_class == 2:
             me = ""
         print("predicted_class", predicted_class)
