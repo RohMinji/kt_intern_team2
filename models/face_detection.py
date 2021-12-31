@@ -8,8 +8,6 @@ from tensorflow.keras.preprocessing.image import img_to_array
 model = load_model('models/keras_model.h5', compile=False)
 model.summary()
 
-print("hello ")
-
 def face_detect(cam, image):
     webcam = cam
     web_frame = image
