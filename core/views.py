@@ -13,7 +13,7 @@ from django.http import StreamingHttpResponse
 
 # Model
 from models.face_detection import face_detect
-from models.pose_detection import pose_detect
+# from models.pose_detection import pose_detect
  
 
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #랜드마크 추출
@@ -27,7 +27,6 @@ EYE_CLOSED_COUNTER=0
 BLINK_COUNT=0
 YAWN_COUNTER = 0
 YAWN_STATUS = False
-SY_COUNT = 0
 
 
 # Index Page Cam Load
@@ -36,40 +35,6 @@ class FaceCamera(object):
         self.video = cv2.VideoCapture(0)
         (self.grabbed, self.frame) = self.video.read()
         threading.Thread(target=self.update, args=()).start()
-
-    def add_overlays(self, image):
-        global SY_COUNT
-
-        webcam = self.video
-        web_frame = image
-    
-        if not webcam.isOpened():
-            print("Could not open webcam")
-            exit()
-        
-        # loop through frames
-        img = cv2.resize(web_frame, (224, 224), interpolation = cv2.INTER_AREA)
-        x = img_to_array(img)
-        x = np.expand_dims(x, axis=0)
-        x = preprocess_input(x)
-    
-        prediction = model.predict(x)
-        predicted_class = np.argmax(prediction[0]) # 예측된 클래스 0, 1, 2
-        
-        if predicted_class == 0:
-            me = "안녕하세요 승용님, 학습을 시작하겠습니다."
-            
-            if SY_COUNT > 30:
-                print("next")
-        elif predicted_class == 1:
-            me = "교육생이 아닙니다."
-            SY_COUNT += 1
-            if SY_COUNT > 100:
-                print("next")
-            
-        elif predicted_class == 2:
-            me = ""
-        print("predicted_class", predicted_class)
 
     def get_frame(self):
         image = self.frame
@@ -160,7 +125,7 @@ class PoseCamera(object):
     def get_frame(self):
         image = self.frame
         cam = self.video
-        pose_detect(cam, image) # model function
+        # pose_detect(cam, image) # model function
         _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
 

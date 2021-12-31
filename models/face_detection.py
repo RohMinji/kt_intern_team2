@@ -8,7 +8,11 @@ from tensorflow.keras.preprocessing.image import img_to_array
 model = load_model('models/keras_model.h5', compile=False)
 model.summary()
 
+SY_COUNT = 0
+
 def face_detect(cam, image):
+    global SY_COUNT
+
     webcam = cam
     web_frame = image
 
@@ -27,8 +31,13 @@ def face_detect(cam, image):
     
     if predicted_class == 0:
         me = "안녕하세요 승용님, 학습을 시작하겠습니다."
+        SY_COUNT += 1
+        if SY_COUNT > 30:
+            print("next") 
+        
     elif predicted_class == 1:
-        me = "교육생이 아닙니다."        
+        me = "교육생이 아닙니다."   
+        
     elif predicted_class == 2:
         me = ""
     print("predicted_class", predicted_class)
