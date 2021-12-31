@@ -11,9 +11,10 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.resnet50 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from PIL import ImageFont, ImageDraw, Image
- 
+
+
 #%%
-model = load_model('keras_model.h5')
+model = load_model('face_detection/keras_model.h5')
 model.summary()
  
 # open webcam (웹캠 열기)
@@ -57,7 +58,7 @@ while webcam.isOpened():
     draw = ImageDraw.Draw(frame_pil)
     draw.text((50, 50), me, font=font1, fill=(15, 92, 255, 3))
     frame = np.array(frame_pil)
-    cv2.imshow('RPS', frame)
+    # cv2.imshow('RPS', frame)
         
     # # press "Q" to stop
     # if cv2.waitKey(1) & 0xFF == ord('q'):
