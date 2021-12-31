@@ -29,13 +29,24 @@ detector = dlib.get_frontal_face_detector() # 얼굴인식
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rightEyeStart, rightEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-
+        
+MINIMUM_EAR = 0.2
+MAXIMUM_FRAME_COUNT = 3
+EYE_CLOSED_COUNTER=0
+BLINK_COUNT=0
+YAWN_COUNTER = 0
+yawn_status = False
 
 class VideoCamera(object):
+    
+
+
+    
     def __init__(self):
         self.video = cv2.VideoCapture(0)
         (self.grabbed, self.frame) = self.video.read()
         threading.Thread(target=self.update, args=()).start()
+
 
     def add_overlays(self, image):
         # image = imutils.resize(image, width=400)
@@ -198,10 +209,6 @@ def calEAR(face):
 #     cv2.imshow("Frame", image)
 #     if cv2.waitKey(1) == 13: #13 is the Enter Key
 #         break
-
-
-
-
 
 def index(request):
     return render(request, "core/index.html")
