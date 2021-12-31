@@ -44,23 +44,25 @@ while webcam.isOpened():
  
     
     if predicted_class == 0:
-        me = "승용님"
+        me = "안녕하세요 승용님, 학습을 시작하겠습니다."
     elif predicted_class == 1:
-        me = "not승용님"        
+        me = "교육생이 아닙니다."        
     elif predicted_class == 2:
         me = ""
                 
     # display
     fontpath = "font/gulim.ttc"
-    font1 = ImageFont.truetype(fontpath, 100)
+    font1 = ImageFont.truetype(fontpath, 30)
     frame_pil = Image.fromarray(frame)
     draw = ImageDraw.Draw(frame_pil)
-    draw.text((50, 50), me, font=font1, fill=(0, 0, 255, 3))
+    draw.text((50, 50), me, font=font1, fill=(15, 92, 255, 3))
     frame = np.array(frame_pil)
     cv2.imshow('RPS', frame)
         
-    # press "Q" to stop
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    # # press "Q" to stop
+    # if cv2.waitKey(1) & 0xFF == ord('q'):
+    #     break
+    if cv2.waitKey(1) == 13: #13 is the Enter Key
         break
     
 # release resources
