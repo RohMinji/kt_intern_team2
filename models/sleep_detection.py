@@ -7,7 +7,7 @@ import subprocess
 import mediapipe as mp
 
 # from core.views import pose_detection
-# from models import pose_detection
+from models.pose_detection import pose_detect
 # from models.pose_detection import detectPose
 
 MINIMUM_EAR = 0.2
@@ -70,15 +70,15 @@ def sleep_detect(image):
             # subprocess.call("POSE_DETECT_final.py", shell=True)
             # cv2.VideoCapture(0).release()
             try:
+                cap = cv2.VideoCapture(0)
                 cv2.VideoCapture(0).release()
-                subprocess.call(['python.exe', "models/pose_detection.py"], shell=True)
-                return
+                pose_detect(cap)
+                # subprocess.call(['python.exe', "models/pose_detection.py"], shell=True)
+                return 0
             except:
-                print("Error to end the video")
-            # mp_pose = mp.solutions.pose
-            # pose = mp_pose.Pose(static_image_mode = True, min_detection_confidence = 0.3)
+                cv2.VideoCapture(0).release()
+                return 0
 
-            # pose_detection.detectPose(image, pose)
 
 def get_landmarks(im):
     rects = detector(im, 1)
