@@ -97,11 +97,11 @@ def dataCollection():
     imgDF=pd.read_csv('static/data/imgDF.csv')
     txtDF=pd.read_csv('static/data/txtDF.csv')
 
-    new_imgDF = pd.DataFrame(img_list)
-    new_txtDF = pd.DataFrame(txt_list)
+    new_imgDF= pd.DataFrame(img_list)
+    new_txtDF= pd.DataFrame(txt_list)
 
-    print(new_imgDF)
-    print(new_txtDF)
+    new_imgDF.columns=['ear','time']
+    new_txtDF.columns=['label','time']
 
     imgDF = pd.concat([imgDF,new_imgDF])
     txtDF = pd.concat([txtDF,new_txtDF])
