@@ -18,8 +18,8 @@ def findCosineSimilarity_1(A, B):
     return dot(A, B)/(norm(A)*norm(B))
 
 def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
-    cap = cv2.VideoCapture(trainer_video)
-    cam = cv2.VideoCapture(user_video)
+    cap = cv2.VideoCapture(trainer_video) # 댄스 영상
+    cam = cv2.VideoCapture(user_video) # 실시간 웹캠
     cam.set(3, 646)
     cam.set(4, 364)
     fps_time = 0 
@@ -120,6 +120,7 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
 mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
 
+# txt 불러오기
 temp = []
 f = open(r"keyp_list/waving_hands_keyplist3.txt", 'r')
 
@@ -135,4 +136,5 @@ keyp_list = []
 for i in range(len(temp)):
     keyp_list.append(list(map(int, temp[i])))
     
+# 함수 실행
 compare_positions(r'dance_video/sample_dance2.mp4', 0, keyp_list)

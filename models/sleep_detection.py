@@ -79,18 +79,17 @@ def sleep_detect(image):
         
     if prev_yawn_status == True and YAWN_STATUS == False:
         YAWN_COUNTER += 1
-        if YAWN_COUNTER >= 3:
-            # subprocess.call("POSE_DETECT_final.py", shell=True)
-            # cv2.VideoCapture(0).release()
+        if YAWN_COUNTER == 3:
             dataCollection()
             try:
                 cap = cv2.VideoCapture(0)
-                cv2.VideoCapture(0).release()
                 pose_detect(cap)
-                # subprocess.call(['python.exe', "models/pose_detection.py"], shell=True)
+                cap.release()
+                cv2.destroyAllWindows()
                 return 0
             except:
                 cv2.VideoCapture(0).release()
+                cv2.destroyAllWindows()
                 return 0
 
 def dataCollection():
