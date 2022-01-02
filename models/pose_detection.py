@@ -167,7 +167,7 @@ def pose_detect(cap):
                 # Curl counter logic
                 if label == "Stand":
                     stage = "down"
-                    if counter == 5:
+                    if counter == 3:
                         cap.release()
                         cv2.destroyAllWindows()
                         break

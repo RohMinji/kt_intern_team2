@@ -14,7 +14,6 @@ from django.http import StreamingHttpResponse
 # Model
 from models.face_detection import face_detect
 from models.sleep_detection import sleep_detect
-# from models.pose_detection import pose_detect
  
 
 # Frame Generator
@@ -47,6 +46,7 @@ class FaceCamera(object):
 
 # Course Page Cam Load
 TEMP_CAP = cv2.VideoCapture(0)
+TEMP_CAP2 = cv2.VideoCapture(0)
 
 class VideoCamera(object):
     def __init__(self):
@@ -58,11 +58,17 @@ class VideoCamera(object):
     def get_frame(self):
         global image
         global TEMP_CAP
+        global TEMP_CAP2
         image = self.frame
         if type(image) != np.ndarray:
             _, image = TEMP_CAP.read()
-        #self.create_Data()
-        sleep_detect(image)
+        try:
+            sleep_detect(image)
+        except:
+            TEMP_CAP.release()
+            _, image = TEMP_CAP2.read()
+            print(image)
+            sleep_detect(image)
         # jpeg encoding
         _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
