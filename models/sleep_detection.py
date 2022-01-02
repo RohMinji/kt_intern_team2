@@ -12,6 +12,8 @@ import pandas as pd
 
 # from core.views import pose_detection
 from models.pose_detection import pose_detect
+from models.dance_detection import compare_positions
+
 # from models.pose_detection import detectPose
 
 MINIMUM_EAR = 0.2
@@ -25,6 +27,25 @@ detector = dlib.get_frontal_face_detector() # 얼굴인식
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #랜드마크 추출
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rightEyeStart, rightEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+
+mp_drawing = mp.solutions.drawing_utils
+mp_holistic = mp.solutions.holistic
+
+# txt 불러오기
+temp = []
+f = open(r"C:\\Users\\User\\Documents\\GitHub\\kt_intern_team2\\dance_detection\\keyp_list\\waving_hands_keyplist3.txt", 'r')
+
+while True: 
+    line = f.readline()
+    if not line: break
+    line = line.replace("\n","")  
+    temp.append(list(map(str, line.split(" ")))[:-1])    
+    
+f.close()
+
+keyp_list = []
+for i in range(len(temp)):
+    keyp_list.append(list(map(int, temp[i])))
 
 img_list=[]
 txt_list=[]
@@ -64,7 +85,7 @@ def sleep_detect(image):
             cv2.putText(image, "Count: {}".format(int((BLINK_COUNT)/5)), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     
     prev_yawn_status = YAWN_STATUS
-    if lip_distance>25:
+    if lip_distance > 25:
         txt_list.append([0,now])
         YAWN_STATUS = True 
     #cv2.putText(frame, "Subject is Yawning", (50,450), 
@@ -84,6 +105,19 @@ def sleep_detect(image):
                 cap = cv2.VideoCapture(0)
                 pose_detect(cap)
                 cap.release()
+                cv2.destroyAllWindows()
+                return 0
+            except:
+                cv2.VideoCapture(0).release()
+                cv2.destroyAllWindows()
+                return 0
+
+        elif YAWN_COUNTER == 4:
+            dataCollection()
+            try:
+                dance_cap = cv2.VideoCapture(0)
+                compare_positions(r'C:\\Users\\User\\Documents\\GitHub\\kt_intern_team2\\dance_detection\\dance_video\\sample_dance2.mp4', dance_cap, keyp_list)
+                dance_cap.release()
                 cv2.destroyAllWindows()
                 return 0
             except:
