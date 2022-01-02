@@ -26,7 +26,7 @@ mp_drawing = mp.solutions.drawing_utils
 pose_video = mp_pose.Pose(static_image_mode = False, min_detection_confidence=0.5)
 
 # Curl counter variables
-assigned_pose = "Lunge" # 이 부분 값 받는 걸로 바꿔주기
+assigned_pose = "Squat" # 이 부분 값 받는 걸로 바꿔주기
 
 model = keras.models.load_model('models/POSE_DETECTING_2021-12-31 11_41.h5') # 모델 잘 되는 걸로 변경필요
 
