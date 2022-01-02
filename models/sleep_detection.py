@@ -80,7 +80,6 @@ def sleep_detect(image):
     if prev_yawn_status == True and YAWN_STATUS == False:
         YAWN_COUNTER += 1
         if YAWN_COUNTER == 3:
-            dataCollection()
             try:
                 cap = cv2.VideoCapture(0)
                 pose_detect(cap)

@@ -1,4 +1,3 @@
-
 import cv2
 import threading
 import dlib
@@ -63,7 +62,6 @@ class VideoCamera(object):
         if type(image) != np.ndarray:
             _, image = TEMP_CAP.read()
         #self.create_Data()
-        print(image)
         sleep_detect(image)
         # jpeg encoding
         _, jpeg = cv2.imencode('.jpg', image)
