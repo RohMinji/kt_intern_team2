@@ -65,6 +65,7 @@ class VideoCamera(object):
             (self.grabbed, self.frame) = self.video.read()
 
 # Pose Page Cam Load
+
 class PoseCamera(object):
     def __init__(self):
         self.video = cv2.VideoCapture(0)

@@ -11,6 +11,7 @@ import time
 import mediapipe as mp
 import matplotlib.pyplot as plt
 
+
 def detectPose(image, pose, display = True):
     # Create a copy of the input image.
     output_image = image.copy()
@@ -90,12 +91,23 @@ mp_drawing = mp.solutions.drawing_utils
 pose_video = mp_pose.Pose(static_image_mode = False, min_detection_confidence=0.5)
 
 # Initialize the VideoCapture object to read from the webcam.
-camera_video = cv2.VideoCapture(0)
+#camera_video = cv2.VideoCapture(0)
 
 # Initialize a resizable window.
-cv2.namedWindow('Pose Classification', cv2.WINDOW_NORMAL)
+#cv2.namedWindow('Pose Classification', cv2.WINDOW_NORMAL)
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+#cap = cv2.VideoCapture(0)
+
+# video = cv2.VideoCapture(0)
+"""
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+
+video.set(cv2.CAP_PROP_FOURCC, 0x32595559)
+
+video.set(cv2.CAP_PROP_FPS, 25) """
 
 # Curl counter variables
 assigned_pose = "Lunge" # 이 부분 값 받는 걸로 바꿔주기
@@ -103,13 +115,14 @@ counter = 0
 
 stage = None
 label = "Stand"
-model = keras.models.load_model('POSE_DETECTING_2021-12-31 11_41.h5') # 모델 잘 되는 걸로 변경필요
+model = keras.models.load_model('models/POSE_DETECTING_2021-12-31 11_41.h5') # 모델 잘 되는 걸로 변경필요
 
 ## Setup mediapipe instance
 with mp_pose.Pose(min_detection_confidence = 0.5, min_tracking_confidence = 0.5) as pose:
     while cap.isOpened():
         ret, frame = cap.read()
-        
+        if ret == False:
+            break
         # Recolor image to RGB
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         image.flags.writeable = False
@@ -201,8 +214,8 @@ with mp_pose.Pose(min_detection_confidence = 0.5, min_tracking_confidence = 0.5)
         
         cv2.imshow('Mediapipe Feed', image)
 
-        if cv2.waitKey(10) & 0xFF == ord('q'):
-            break
+        #if cv2.waitKey(10) & 0xFF == ord('q'):
+        #    break
 
     cap.release()
     cv2.destroyAllWindows()

@@ -93,7 +93,7 @@ pose_video = mp_pose.Pose(static_image_mode = False, min_detection_confidence=0.
 camera_video = cv2.VideoCapture(0)
 
 # Initialize a resizable window.
-cv2.namedWindow('Pose Classification', cv2.WINDOW_NORMAL)
+#cv2.namedWindow('Pose Classification', cv2.WINDOW_NORMAL)
 
 cap = cv2.VideoCapture(0)
 

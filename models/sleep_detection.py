@@ -3,6 +3,12 @@ import dlib
 from imutils import face_utils
 import numpy as np
 from scipy.spatial import distance as dist
+import subprocess
+import mediapipe as mp
+
+# from core.views import pose_detection
+# from models import pose_detection
+# from models.pose_detection import detectPose
 
 MINIMUM_EAR = 0.2
 MAXIMUM_FRAME_COUNT = 3
@@ -60,7 +66,19 @@ def sleep_detect(image):
         
     if prev_yawn_status == True and YAWN_STATUS == False:
         YAWN_COUNTER += 1
+        if YAWN_COUNTER >= 3:
+            # subprocess.call("POSE_DETECT_final.py", shell=True)
+            # cv2.VideoCapture(0).release()
+            try:
+                cv2.VideoCapture(0).release()
+                subprocess.call(['python.exe', "models/pose_detection.py"], shell=True)
+                return
+            except:
+                print("Error to end the video")
+            # mp_pose = mp.solutions.pose
+            # pose = mp_pose.Pose(static_image_mode = True, min_detection_confidence = 0.3)
 
+            # pose_detection.detectPose(image, pose)
 
 def get_landmarks(im):
     rects = detector(im, 1)

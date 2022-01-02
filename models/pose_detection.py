@@ -1,5 +1,6 @@
 # 필요한 모듈 호출
 
+
 import os
 import math
 import keras
@@ -11,7 +12,9 @@ import time
 import mediapipe as mp
 import matplotlib.pyplot as plt
 
+print("Success")
 def detectPose(image, pose, display = True):
+    
     # Create a copy of the input image.
     output_image = image.copy()
     
@@ -90,12 +93,12 @@ mp_drawing = mp.solutions.drawing_utils
 pose_video = mp_pose.Pose(static_image_mode = False, min_detection_confidence=0.5)
 
 # Initialize the VideoCapture object to read from the webcam.
-camera_video = cv2.VideoCapture(0)
+#camera_video = cv2.VideoCapture(0)
 
 # Initialize a resizable window.
-cv2.namedWindow('Pose Classification', cv2.WINDOW_NORMAL)
+#cv2.namedWindow('Pose Classification', cv2.WINDOW_NORMAL)
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
 # Curl counter variables
 assigned_pose = "Lunge" # 이 부분 값 받는 걸로 바꿔주기
@@ -205,4 +208,4 @@ with mp_pose.Pose(min_detection_confidence = 0.5, min_tracking_confidence = 0.5)
             break
 
     cap.release()
-    cv2.destroyAllWindows()
+    cv2.destroyAllWindows() 
