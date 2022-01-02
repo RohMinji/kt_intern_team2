@@ -168,6 +168,8 @@ def pose_detect(cap):
                 if label == "Stand":
                     stage = "down"
                     if counter == 5:
+                        cap.release()
+                        cv2.destroyAllWindows()
                         break
                 if label == assigned_pose and stage =='down':
                     time.sleep(0.2)
@@ -202,3 +204,6 @@ def pose_detect(cap):
 
             if cv2.waitKey(10) & 0xFF == ord('q'):
                 break
+
+    cap.release()
+    cv2.destroyAllWindows()

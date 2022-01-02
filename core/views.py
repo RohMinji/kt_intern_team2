@@ -23,7 +23,8 @@ def gen(camera):
     while True:
         frame = camera.get_frame()
         yield(b'--frame\r\n'
-              b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
 
 
 # Index Page Cam Load
@@ -46,8 +47,9 @@ class FaceCamera(object):
 
 
 # Course Page Cam Load
-class VideoCamera(object):
+TEMP_CAP = cv2.VideoCapture(0)
 
+class VideoCamera(object):
     def __init__(self):
         self.video = cv2.VideoCapture(0)
         self.create_Data()
@@ -56,8 +58,12 @@ class VideoCamera(object):
 
     def get_frame(self):
         global image
+        global TEMP_CAP
         image = self.frame
+        if type(image) != np.ndarray:
+            _, image = TEMP_CAP.read()
         #self.create_Data()
+        print(image)
         sleep_detect(image)
         # jpeg encoding
         _, jpeg = cv2.imencode('.jpg', image)

@@ -31,3 +31,5 @@ $('#start-btn').click(function (e) {
         }
     });
 });
+
+// Sleep Detect => Course STOP
