@@ -5,6 +5,7 @@ import dlib
 import numpy as np
 from imutils import face_utils
 from scipy.spatial import distance as dist
+import pandas as pd
 
 # Django
 from django.shortcuts import render
@@ -49,12 +50,14 @@ class VideoCamera(object):
 
     def __init__(self):
         self.video = cv2.VideoCapture(0)
+        self.create_Data()
         (self.grabbed, self.frame) = self.video.read()
         threading.Thread(target=self.update, args=()).start()
 
     def get_frame(self):
         global image
         image = self.frame
+        #self.create_Data()
         sleep_detect(image)
         # jpeg encoding
         _, jpeg = cv2.imencode('.jpg', image)
@@ -63,6 +66,14 @@ class VideoCamera(object):
     def update(self):
         while True:
             (self.grabbed, self.frame) = self.video.read()
+    
+    def create_Data(self):
+
+        txtDF= pd.DataFrame(columns=['label','time'])
+        imgDF= pd.DataFrame(columns=['ear','time'])
+
+        txtDF.to_csv('static/data/txtDF.csv',header = True, index=False)
+        imgDF.to_csv('static/data/imgDF.csv',header = True, index=False)
 
 # Pose Page Cam Load
 

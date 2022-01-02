@@ -1,3 +1,4 @@
+from PIL.Image import new
 import cv2
 import dlib
 from imutils import face_utils
@@ -5,6 +6,9 @@ import numpy as np
 from scipy.spatial import distance as dist
 import subprocess
 import mediapipe as mp
+import datetime
+import pandas as pd
+
 
 # from core.views import pose_detection
 from models.pose_detection import pose_detect
@@ -22,6 +26,8 @@ predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #ëžœë“
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rightEyeStart, rightEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
+img_list=[]
+txt_list=[]
 
 def sleep_detect(image):
     global YAWN_STATUS
@@ -30,16 +36,22 @@ def sleep_detect(image):
     global YAWN_COUNTER
     global EYE_CLOSED_COUNTER
 
+    now = datetime.datetime.now()
+    now = now.strftime('%H:%M:%S')
+    now = str(now)
+
     image_landmarks, lip_distance = mouth_open(image)
     grayImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     faces = detector(grayImage, 0)
 
     if len(faces)<1:
+        txt_list.append([1,now])
         cv2.putText(image, "No Student", (50,450),
                 cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
 
     for face in faces:
         ear= calEAR(face, image)
+        img_list.append([1/ear,now])
         if ear < MINIMUM_EAR:
             EYE_CLOSED_COUNTER += 1
         else:
@@ -53,6 +65,7 @@ def sleep_detect(image):
     
     prev_yawn_status = YAWN_STATUS
     if lip_distance>25:
+        txt_list.append([0,now])
         YAWN_STATUS = True 
     #cv2.putText(frame, "Subject is Yawning", (50,450), 
     #           cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
@@ -69,6 +82,7 @@ def sleep_detect(image):
         if YAWN_COUNTER >= 3:
             # subprocess.call("POSE_DETECT_final.py", shell=True)
             # cv2.VideoCapture(0).release()
+            dataCollection()
             try:
                 cap = cv2.VideoCapture(0)
                 cv2.VideoCapture(0).release()
@@ -79,6 +93,21 @@ def sleep_detect(image):
                 cv2.VideoCapture(0).release()
                 return 0
 
+def dataCollection():
+    imgDF=pd.read_csv('static/data/imgDF.csv')
+    txtDF=pd.read_csv('static/data/txtDF.csv')
+
+    new_imgDF = pd.DataFrame(img_list)
+    new_txtDF = pd.DataFrame(txt_list)
+
+    print(new_imgDF)
+    print(new_txtDF)
+
+    imgDF = pd.concat([imgDF,new_imgDF])
+    txtDF = pd.concat([txtDF,new_txtDF])
+
+    imgDF.to_csv('static/data/imgDF.csv',header=True, index=False)
+    txtDF.to_csv('static/data/txtDF.csv',header=True, index=False)
 
 def get_landmarks(im):
     rects = detector(im, 1)
