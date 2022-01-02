@@ -33,7 +33,7 @@ mp_holistic = mp.solutions.holistic
 
 # txt 불러오기
 temp = []
-f = open(r"C:\\Users\\User\\Documents\\GitHub\\kt_intern_team2\\dance_detection\\keyp_list\\waving_hands_keyplist3.txt", 'r')
+f = open('static/waving_hands_keyplist3.txt', 'r')
 
 while True: 
     line = f.readline()
@@ -113,10 +113,9 @@ def sleep_detect(image):
                 return 0
 
         elif YAWN_COUNTER == 4:
-            dataCollection()
             try:
                 dance_cap = cv2.VideoCapture(0)
-                compare_positions(r'C:\\Users\\User\\Documents\\GitHub\\kt_intern_team2\\dance_detection\\dance_video\\sample_dance2.mp4', dance_cap, keyp_list)
+                compare_positions('static/sample_dance2.mp4', dance_cap, keyp_list)
                 dance_cap.release()
                 cv2.destroyAllWindows()
                 return 0

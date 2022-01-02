@@ -1,6 +1,4 @@
 from django.shortcuts import render
-import dataImage
-
 import csv
 import pandas as pd
 from matplotlib import pyplot as plt
