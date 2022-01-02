@@ -14,4 +14,5 @@ urlpatterns = [
     path('course/', views.course, name="course"),
     path('api/doc', get_swagger_view(title='Rest API Document')),
     path('api/v1/', include((router.urls, 'recognitions'), namespace="api")),
+    path('result/', views.result, name="result"),
 ]
