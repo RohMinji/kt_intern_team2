@@ -108,11 +108,11 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
 
                     # If the disctance is below the threshold
                     if 0.98 <= sim_score <= 1:
-#                         cv2.putText(image1, "CORRECT STEPS", (120, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                       # cv2.putText(image1, "CORRECT STEPS", (120, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                         cv2.putText(image1, "SCORE : " + str(int(sum(tot_score)/len_tot*100)), (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                         tot_score.append(1)
                     else:
-#                         cv2.putText(image1,  "NOT CORRECT STEPS", (80, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                        # cv2.putText(image1,  "NOT CORRECT STEPS", (80, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                         cv2.putText(image1, "SCORE : " + str(int(sum(tot_score)/len_tot*100)), (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                         tot_score.append(0)
                     cv2.putText(image1, "FPS: %f" % (1.0 / (time.time() - fps_time)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
@@ -138,5 +138,5 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
         cap.release()
         cv2.destroyAllWindows()
         print((sum(tot_score) / len_tot) * 100)
-#         print((sum(tot_score) / len(tot_score)) * 100)
+        # print((sum(tot_score) / len(tot_score)) * 100)
     
