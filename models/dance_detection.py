@@ -60,11 +60,10 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
                 image1 = cv2.cvtColor(frame_1, cv2.COLOR_BGR2RGB)
                 image2 = cv2.cvtColor(frame_2, cv2.COLOR_BGR2RGB)
                 
-                # Make Detections
-                results1 = holistic.process(image1)
-                results2 = holistic.process(image2)
+                # # Make Detections
+                # results1 = holistic.process(image1)
+                # results2 = holistic.process(image2)
 
-                
                 #Showing FPS
                 cv2.putText(image2, "FPS: %f" % (1.0 / (time.time() - fps_time)), (10, 10),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
                 
@@ -75,6 +74,7 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
                 # Recolor image back to BGR for rendering
                 image1 = cv2.cvtColor(image1, cv2.COLOR_RGB2BGR)
                 image1 = cv2.flip(image1, 1) # 좌우대칭
+
                 output_image1 = image1.copy()
                 output_image2 = image2.copy()
                 
@@ -82,7 +82,7 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
                 imageRGB2 = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
                 
                 results1 = holistic.process(image1)
-                results2 = holistic.process(image2)
+                # results2 = holistic.process(image2)
                 
                 height, width, _ = image1.shape
                 min_= -100 # Intializing a value to get minimum cosine similarity score from the dancer array list with the user

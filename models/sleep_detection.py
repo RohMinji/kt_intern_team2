@@ -13,7 +13,6 @@ import pandas as pd
 # from core.views import pose_detection
 from models.pose_detection import pose_detect
 from models.dance_detection import compare_positions
-
 # from models.pose_detection import detectPose
 
 MINIMUM_EAR = 0.2
@@ -56,6 +55,8 @@ def sleep_detect(image):
     global BLINK_COUNT
     global YAWN_COUNTER
     global EYE_CLOSED_COUNTER
+    global client_socket
+    from core.views import client_socket
 
     now = datetime.datetime.now()
     now = now.strftime('%H:%M:%S')
@@ -101,6 +102,7 @@ def sleep_detect(image):
     if prev_yawn_status == True and YAWN_STATUS == False:
         YAWN_COUNTER += 1
         if YAWN_COUNTER == 3:
+            client_socket.sendall("졸음 깨기 1단계를 시작합니다.".encode())
             try:
                 cap = cv2.VideoCapture(0)
                 pose_detect(cap)
@@ -112,7 +114,8 @@ def sleep_detect(image):
                 cv2.destroyAllWindows()
                 return 0
 
-        elif YAWN_COUNTER == 4:
+        elif YAWN_COUNTER == 5:
+            client_socket.sendall("졸음 깨기 2단계를 시작합니다.".encode())
             try:
                 dance_cap = cv2.VideoCapture(0)
                 compare_positions('static/sample_dance2.mp4', dance_cap, keyp_list)
