@@ -1,5 +1,6 @@
 from PIL.Image import new
 import cv2
+from django.http.response import HttpResponse
 import dlib
 from imutils import face_utils
 import numpy as np
@@ -9,10 +10,13 @@ import mediapipe as mp
 import datetime
 import pandas as pd
 
+from django.http import JsonResponse
+import json
 
 # from core.views import pose_detection
 from models.pose_detection import pose_detect
 from models.dance_detection import compare_positions
+from recognitions.views import course
 
 # from models.pose_detection import detectPose
 
@@ -67,8 +71,10 @@ def sleep_detect(image):
 
     if len(faces)<1:
         txt_list.append([1,now])
-        cv2.putText(image, "No Student", (50,450),
-                cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
+        cv2.putText(image, "No Student", (50,450), cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
+        sy_exist(len(faces)) # Course Video STOP
+    else:
+        pass
 
     for face in faces:
         ear= calEAR(face, image)
@@ -225,3 +231,14 @@ def calEAR(face, image):
     
     return ear
 
+
+def sy_exist(sy_exist):
+    print("sy_exist", sy_exist)
+    
+    if sy_exist == 0:
+        data = {
+            "sy_exist": sy_exist,
+        }
+        return JsonResponse(data)
+    else:
+        return HttpResponse("PASS", status=200)

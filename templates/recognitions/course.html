@@ -16,7 +16,7 @@
         <div class="row" id="content">
             <div class="col">
                 <div>
-                    <video src="{% static 'sample.mp4' %}" width=500 height=400 controls id="course-player"></video>
+                    <video src="{% static 'sample.mp4' %}" width=500 height=400 controls id="course-player" autoplay muted></video>
                 </div>
                 <div class="text-center">
                     <button class ="btn btn-primary" id="btn-play" onclick="videoPlay()">Play</button>
@@ -31,4 +31,8 @@
     </div>
 </body>
 </html>
+<script>
+    const SY_EXIST_URL = "{% url 'core:sy_exist' %}"
+    const CSRF_TOKEN = "{{ csrf_token }}"
+</script>
 <script src="{% static 'js/scripts.js' %}"></script>
