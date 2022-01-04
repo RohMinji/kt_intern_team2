@@ -1,43 +1,40 @@
-# 필요한 모듈 호출
-import os
-import math
 import cv2
-import numpy as np
-import pandas as pd
-from time import time
 import time
 import mediapipe as mp
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import Normalizer
 from numpy import dot
 from numpy.linalg import norm
 
+# Call Module for Media Pipe
 mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
 
 # Score
 avg_score = "None"
 
-# 코사인 유사도
+# Cosine Similarity
 def findCosineSimilarity_1(A, B):
     return dot(A, B)/(norm(A)*norm(B))
 
+# Evaluate User's Motion
 def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
     global avg_score
-    cap = cv2.VideoCapture(trainer_video) # 댄스 영상
-    # cam = cv2.VideoCapture(user_video) # 실시간 웹캠
-    cam = user_video # 실시간 웹캠
+    cap = cv2.VideoCapture(trainer_video) # Dance Detect Cam
+    cam = user_video # Live Cam
+
     cam.set(3, 646)
     cam.set(4, 364)
     
     key_ = 0
-    tot_score=[]
-    len_tot=1
+    tot_score = []
+    len_tot = 1
+
+    # Dance Detection
     with mp_holistic.Holistic(min_detection_confidence = 0.5, min_tracking_confidence = 0.5) as holistic:
         while cap.isOpened() and cam.isOpened():
             ret_1, frame_1 = cam.read()
             ret_2, frame_2 = cap.read()
             
+            # Preprocessing Video
             if frame_1 is not None and frame_2 is not None:
                 # Recolor Feed
                 image1 = cv2.cvtColor(frame_1, cv2.COLOR_BGR2RGB)
@@ -49,19 +46,12 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
                 
                 # Recolor image back to BGR for rendering
                 image1 = cv2.cvtColor(image1, cv2.COLOR_RGB2BGR)
-                image1 = cv2.flip(image1, 1) # 좌우대칭
-
-                output_image1 = image1.copy()
-                output_image2 = image2.copy()
-                
-                imageRGB1 = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
-                imageRGB2 = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
+                image1 = cv2.flip(image1, 1)
                 
                 results1 = holistic.process(image1)
-                
                 height, width, _ = image1.shape
-                min_= -100 # Intializing a value to get minimum cosine similarity score from the dancer array list with the user
-                
+
+                # Calculate the Cosine Similarity
                 features = [0] * 66
                 if results1.pose_landmarks:
                     points = results1.pose_landmarks.landmark
@@ -76,7 +66,6 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
 
                 sim_score = findCosineSimilarity_1(keyp_list[key_ * 20], features)
                 key_ += 1
-
 
                 # Displaying the minimum cosine score
                 cv2.putText(image1, "Similarity : " + str(sim_score * 100) + " %", (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), 2)
