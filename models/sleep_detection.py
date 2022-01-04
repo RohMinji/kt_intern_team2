@@ -54,8 +54,7 @@ eyesize_dic={}
 empty_dic={}
 
 # POSE_DETECT 함수를 호출하는 함수
-def call_pose_func():
-    assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
+def call_pose_func(assigned_pose):
     try:
         cap = cv2.VideoCapture(0)
         pose_detect(cap, assigned_pose)
@@ -133,20 +132,26 @@ def sleep_detect(image):
     if prev_yawn_status == True and YAWN_STATUS == False:
         YAWN_COUNTER += 1
         if YAWN_COUNTER == 3 and STAGE == 0:
+            assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
             # client_socket.sendall("졸음 깨기 1단계를 시작합니다.".encode())
+            # client_socket.sendall(str(assigned_pose) + "를 3회 시행해주세요.".encode())
             STAGE = 1
-            call_pose_func()
+            call_pose_func(assigned_pose)
 
         elif YAWN_COUNTER == 5 and STAGE == 1:
             # client_socket.sendall("졸음 깨기 2단계를 시작합니다.".encode())
+            # client_socket.sendall("음악에 맞춰 춤을 춰주세요.".encode())
             STAGE = 2
             call_dance_func()
     elif int((BLINK_COUNT) / 5) == 3 and STAGE == 0:
+        assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
         # client_socket.sendall("졸음 깨기 1단계를 시작합니다.".encode())
+        # client_socket.sendall(str(assigned_pose) + "를 3회 시행해주세요.".encode())
         STAGE = 1
-        call_pose_func()
+        call_pose_func(assigned_pose)
     elif int((BLINK_COUNT) / 5) == 6 and STAGE == 1:
         # client_socket.sendall("졸음 깨기 2단계를 시작합니다.".encode())
+        # client_socket.sendall("음악에 맞춰 춤을 춰주세요.".encode())
         STAGE = 2
         call_dance_func()
 
