@@ -29,6 +29,7 @@ pose_video = mp_pose.Pose(static_image_mode = False, min_detection_confidence=0.
 
 model = load('models/POSE_MODEL.joblib')
 
+
 counter = 0
 stage = None
 label = "Stand"
