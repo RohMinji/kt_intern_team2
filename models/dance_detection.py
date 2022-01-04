@@ -29,7 +29,6 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
     cam = user_video # 실시간 웹캠
     cam.set(3, 646)
     cam.set(4, 364)
-    fps_time = 0 
     
     key_ = 0
     tot_score=[]
@@ -43,14 +42,7 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
                 # Recolor Feed
                 image1 = cv2.cvtColor(frame_1, cv2.COLOR_BGR2RGB)
                 image2 = cv2.cvtColor(frame_2, cv2.COLOR_BGR2RGB)
-                
-                # # Make Detections
-                # results1 = holistic.process(image1)
-                # results2 = holistic.process(image2)
 
-                #Showing FPS
-                cv2.putText(image2, "FPS: %f" % (1.0 / (time.time() - fps_time)), (10, 10),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-                
                 #Displaying the dancer feed.
                 image2 = cv2.cvtColor(image2, cv2.COLOR_RGB2BGR)
                 cv2.imshow('Dancer Window', image2)
@@ -66,11 +58,11 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
                 imageRGB2 = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
                 
                 results1 = holistic.process(image1)
-                # results2 = holistic.process(image2)
                 
                 height, width, _ = image1.shape
                 min_= -100 # Intializing a value to get minimum cosine similarity score from the dancer array list with the user
-            
+                
+                features = [0] * 66
                 if results1.pose_landmarks:
                     points = results1.pose_landmarks.landmark
                     features = []
@@ -82,25 +74,22 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
                             features.append(0)
                             features.append(0)
 
-                            
-                    sim_score = findCosineSimilarity_1(keyp_list[key_ * 33],features)
-                    key_ += 1
+                sim_score = findCosineSimilarity_1(keyp_list[key_ * 20], features)
+                key_ += 1
 
 
-                    # Displaying the minimum cosine score
-                    cv2.putText(image1, str(sim_score), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                # Displaying the minimum cosine score
+                cv2.putText(image1, "Similarity : " + str(sim_score * 100) + " %", (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), 2)
 
-                    # If the disctance is below the threshold
-                    if 0.98 <= sim_score <= 1:
-                       # cv2.putText(image1, "CORRECT STEPS", (120, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                        cv2.putText(image1, "SCORE : " + str(int(sum(tot_score)/len_tot*100)), (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                        tot_score.append(1)
-                    else:
-                        # cv2.putText(image1,  "NOT CORRECT STEPS", (80, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                        cv2.putText(image1, "SCORE : " + str(int(sum(tot_score)/len_tot*100)), (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                        tot_score.append(0)
-                    cv2.putText(image1, "FPS: %f" % (1.0 / (time.time() - fps_time)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-                    len_tot=len(tot_score)
+                # If the disctance is below the threshold
+                if 0.98 <= sim_score <= 1:
+                    cv2.putText(image1, "SCORE : " + str(int(sum(tot_score)/len_tot*100)), (10, 70), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2)
+                    tot_score.append(1)
+                else:
+                    cv2.putText(image1, "SCORE : " + str(int(sum(tot_score)/len_tot*100)), (10, 70), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), 2)
+                    tot_score.append(0)
+                    
+                len_tot = len(tot_score)
 
                 
                 # Render detections
@@ -111,8 +100,6 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
         
                 # Display the user feed
                 cv2.imshow('User Window', image1)
-
-                fps_time = time.time()
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
             else:
