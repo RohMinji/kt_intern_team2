@@ -1,22 +1,16 @@
-from PIL.Image import new
 import cv2
-from django.http.response import HttpResponse
 import dlib
 from imutils import face_utils
 import numpy as np
 from scipy.spatial import distance as dist
-import subprocess
-import mediapipe as mp
 import datetime
 import pandas as pd
-
 from django.http import JsonResponse
-import json
+import mediapipe as mp
 
 # from core.views import pose_detection
 from models.pose_detection import pose_detect
 from models.dance_detection import compare_positions
-from recognitions.views import course
 
 # from models.pose_detection import detectPose
 
@@ -32,8 +26,30 @@ predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #랜�
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rightEyeStart, rightEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-img_list={}
-txt_list={}
+mp_drawing = mp.solutions.drawing_utils
+mp_holistic = mp.solutions.holistic
+
+# txt 불러오기
+temp = []
+f = open('static/waving_hands_keyplist3.txt', 'r')
+
+while True: 
+    line = f.readline()
+    if not line: break
+    line = line.replace("\n","")  
+    temp.append(list(map(str, line.split(" ")))[:-1])    
+    
+f.close()
+
+keyp_list = []
+for i in range(len(temp)):
+    keyp_list.append(list(map(int, temp[i])))
+
+
+#눈크기값dict
+eyesize_dic={}
+#자리비운시각dict
+empty_dic={}
 
 def sleep_detect(image):
     global YAWN_STATUS
@@ -53,7 +69,7 @@ def sleep_detect(image):
     faces = detector(grayImage, 0)
 
     if len(faces)<1:
-        txt_list.append([1,now])
+        empty_dic[now] = 1
         cv2.putText(image, "No Student", (50,450), cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
         # videoStop(len(faces)) # Course Video STOP
     else:
@@ -61,7 +77,7 @@ def sleep_detect(image):
 
     for face in faces:
         ear= calEAR(face, image)
-        img_list[now]=1/ear
+        eyesize_dic[now]=1/ear
         if ear < MINIMUM_EAR:
             EYE_CLOSED_COUNTER += 1
         else:
@@ -74,12 +90,8 @@ def sleep_detect(image):
             cv2.putText(image, "Count: {}".format(int((BLINK_COUNT)/5)), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     
     prev_yawn_status = YAWN_STATUS
-    if lip_distance>25:
-        #txt_list.append([now,0])
-        txt_list[now]=0
+    if lip_distance > 25:
         YAWN_STATUS = True 
-    #cv2.putText(frame, "Subject is Yawning", (50,450), 
-    #           cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
     
         output_text = " Yawn Count: " + str(YAWN_COUNTER + 1)
 
@@ -116,9 +128,6 @@ def sleep_detect(image):
                 cv2.destroyAllWindows()
                 return 0
 
-def dataCollection():
-    imgDF=pd.read_csv('static/data/imgDF.csv')
-    txtDF=pd.read_csv('static/data/txtDF.csv')
 
 def get_landmarks(im):
     rects = detector(im, 1)

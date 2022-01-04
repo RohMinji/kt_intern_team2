@@ -102,13 +102,13 @@ class VideoCamera(object):
         image = self.frame
         if type(image) != np.ndarray:
             _, image = TEMP_CAP.read()
-        #self.create_Data()
-
         try:
             sleep_detect(image)
         except:
+            print("--------------SLEEP DETECT EXCEPT------------------")
             TEMP_CAP.release()
             _, image = TEMP_CAP2.read()
+            sleep_detect(image)
 
         # if YAWN_COUNTER == 5:
         #     # client_socket.sendall("수고하셨습니다, 영상을 다시 재생합니다.".encode())
