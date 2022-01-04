@@ -140,16 +140,16 @@ def pose_detect(cap, assigned_pose):
             
             # Display Status
             cv2.rectangle(image, (0, 0), (235, 73), (211, 197, 203), -1)
-            cv2.putText(image, 'REPS', (15, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (159, 141, 106), 1, cv2.LINE_AA)
-            cv2.putText(image, str(counter), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 1.7, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(image, 'COUNT', (15, 12), cv2.FONT_HERSHEY_DUPLEX, 0.5, (159, 141, 106), 1, cv2.LINE_AA)
+            cv2.putText(image, str(counter), (10,60), cv2.FONT_HERSHEY_DUPLEX, 1.7, (255, 255, 255), 2, cv2.LINE_AA)
 
-            cv2.putText(image, 'STAGE', (100, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (159, 141, 106), 1, cv2.LINE_AA)
-            cv2.putText(image, stage, (90, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.putText(image, 'STAGE', (100, 12), cv2.FONT_HERSHEY_DUPLEX, 0.5, (159, 141, 106), 1, cv2.LINE_AA)
+            cv2.putText(image, stage, (90, 60), cv2.FONT_HERSHEY_DUPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
 
             if label == assigned_pose or label == "Stand":
-                cv2.putText(image, label, (350, 60),cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 2)
+                cv2.putText(image, label, (350, 60),cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 3)
             else:
-                cv2.putText(image, "UnKnown", (350, 60),cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 255), 2) # B, G, R
+                cv2.putText(image, "UnKnown", (350, 60),cv2.FONT_HERSHEY_DUPLEX, 2, (0, 0, 255), 3) # B, G, R
                 
             # Render detections
             mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,

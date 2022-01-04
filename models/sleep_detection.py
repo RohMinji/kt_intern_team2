@@ -72,7 +72,7 @@ def sleep_detect(image):
     if len(faces)<1:
         empty_dic[now] = 1
         eyesize_dic[now] = 0
-        cv2.putText(image, "No Student", (50,450), cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
+        cv2.putText(image, "No Student", (50,450), cv2.FONT_HERSHEY_DUPLEX, 1.5, (0,0,255), 2)
         # videoStop(len(faces)) # Course Video STOP
     else:
         pass
@@ -87,18 +87,17 @@ def sleep_detect(image):
         #cv2.putText(frame, "EAR: {}".format(round(ear, 1)), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
         if EYE_CLOSED_COUNTER >= MAXIMUM_FRAME_COUNT:
-            cv2.putText(image, "Drowsiness", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(image, "Sleep", (10, 60), cv2.FONT_HERSHEY_DUPLEX, 1.2, (0, 0, 255), 2)
             BLINK_COUNT += 1
-            cv2.putText(image, "Count: {}".format(int((BLINK_COUNT)/5)), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(image, "Count: {}".format(int((BLINK_COUNT)/5)), (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1.2, (0, 0, 255), 2)
     
     prev_yawn_status = YAWN_STATUS
     if lip_distance > 25:
         YAWN_STATUS = True 
     
         output_text = " Yawn Count: " + str(YAWN_COUNTER + 1)
-
-        cv2.putText(image, output_text, (50,50),
-                cv2.FONT_HERSHEY_COMPLEX, 1,(0,255,127),2)
+        cv2.putText(image, output_text, (50, 50),
+                cv2.FONT_HERSHEY_DUPLEX, 1.2, (0,255,127), 2)
     else:
         YAWN_STATUS = False 
         
@@ -155,7 +154,7 @@ def annotate_landmarks(im, landmarks):
     for idx, point in enumerate(landmarks):
         pos = (point[0, 0], point[0, 1])
         cv2.putText(im, str(idx), pos,
-                    fontFace=cv2.FONT_HERSHEY_SCRIPT_SIMPLEX,
+                    fontFace=cv2.FONT_HERSHEY_DUPLEX,
                     fontScale=0.4,
                     color=(0, 0, 255))
         cv2.circle(im, pos, 3, color=(0, 255, 255))
