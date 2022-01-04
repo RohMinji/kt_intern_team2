@@ -7,14 +7,10 @@ import time
 import mediapipe as mp
 import matplotlib.pyplot as plt
 import random
-from time import time
 from joblib import load
 
 # Initializing mediapipe pose class
 mp_pose = mp.solutions.pose
-
-# Setting up the Pose function
-pose = mp_pose.Pose(static_image_mode = True, min_detection_confidence = 0.3)
 
 # Initializing mediapipe drawing class, useful for annotation
 mp_drawing = mp.solutions.drawing_utils
@@ -24,7 +20,6 @@ pose_video = mp_pose.Pose(static_image_mode = False, min_detection_confidence=0.
 
 # Curl counter variables
 model = load('models/POSE_MODEL.joblib')
-
 
 counter = 0
 stage = None
@@ -64,8 +59,10 @@ def calculateAngle(landmark1, landmark2, landmark3):
         angle += 360
     return angle
 
+
 # Evaluate User's Motion
 def pose_detect(cap, assigned_pose):
+    print("POSE DETECT FUNCTION START")
     global counter
     global stage
     global label
@@ -78,8 +75,11 @@ def pose_detect(cap, assigned_pose):
             
             image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image.flags.writeable = False
+            image = cv2.flip(image, 1)
+            
+            # Make detection
             results = pose.process(image)
-            image.flags.writeable = True
+            image.flags.writeable = False
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             
             # Calculate the required angles
@@ -122,11 +122,12 @@ def pose_detect(cap, assigned_pose):
                 
                 if Time + 5 < time.time():
                     if label == "Stand":
-                        stage = "down"
                         if counter == 3:
                             cap.release()
                             cv2.destroyAllWindows()
                             break
+                        else:
+                            stage = "down"
 
                     if label == assigned_pose and stage =='down':
                         time.sleep(0.2)
@@ -140,16 +141,18 @@ def pose_detect(cap, assigned_pose):
             
             # Display Status
             cv2.rectangle(image, (0, 0), (235, 73), (211, 197, 203), -1)
-            cv2.putText(image, 'REPS', (15, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (159, 141, 106), 1, cv2.LINE_AA)
-            cv2.putText(image, str(counter), (10,60), cv2.FONT_HERSHEY_SIMPLEX, 1.7, (255, 255, 255), 2, cv2.LINE_AA)
-
-            cv2.putText(image, 'STAGE', (100, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (159, 141, 106), 1, cv2.LINE_AA)
-            cv2.putText(image, stage, (90, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
-
+            
+            # Rep data
+            cv2.putText(image, 'COUNT', (15, 12), cv2.FONT_HERSHEY_DUPLEX, 0.5, (159, 141, 106), 1, cv2.LINE_AA)
+            cv2.putText(image, str(counter), (10,60), cv2.FONT_HERSHEY_DUPLEX, 1.7, (255, 255, 255), 2, cv2.LINE_AA)
+            
+            # Stage data
+            cv2.putText(image, 'STAGE', (100, 12), cv2.FONT_HERSHEY_DUPLEX, 0.5, (159, 141, 106), 1, cv2.LINE_AA)
+            cv2.putText(image, stage, (90, 60), cv2.FONT_HERSHEY_DUPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
             if label == assigned_pose or label == "Stand":
-                cv2.putText(image, label, (350, 60),cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 2)
+                cv2.putText(image, label, (350, 60),cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 3)
             else:
-                cv2.putText(image, "UnKnown", (350, 60),cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 255), 2) # B, G, R
+                cv2.putText(image, "UnKnown", (350, 60),cv2.FONT_HERSHEY_DUPLEX, 2, (0, 0, 255), 3) # B, G, R
                 
             # Render detections
             mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
