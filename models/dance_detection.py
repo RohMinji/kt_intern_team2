@@ -29,7 +29,6 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
     cam = user_video # 실시간 웹캠
     cam.set(3, 646)
     cam.set(4, 364)
-    fps_time = 0 
     
     key_ = 0
     tot_score=[]
@@ -43,10 +42,6 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
                 # Recolor Feed
                 image1 = cv2.cvtColor(frame_1, cv2.COLOR_BGR2RGB)
                 image2 = cv2.cvtColor(frame_2, cv2.COLOR_BGR2RGB)
-                
-                # # Make Detections
-                # results1 = holistic.process(image1)
-                # results2 = holistic.process(image2)
 
                 #Displaying the dancer feed.
                 image2 = cv2.cvtColor(image2, cv2.COLOR_RGB2BGR)
@@ -63,7 +58,6 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
                 imageRGB2 = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
                 
                 results1 = holistic.process(image1)
-                # results2 = holistic.process(image2)
                 
                 height, width, _ = image1.shape
                 min_= -100 # Intializing a value to get minimum cosine similarity score from the dancer array list with the user
@@ -107,8 +101,6 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
         
                 # Display the user feed
                 cv2.imshow('User Window', image1)
-
-                fps_time = time.time()
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
             else:

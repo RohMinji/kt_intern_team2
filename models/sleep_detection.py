@@ -52,6 +52,32 @@ eyesize_dic={}
 #자리비운시각dict
 empty_dic={}
 
+# POSE_DETECT 함수를 호출하는 함수
+def call_pose_func(assigned_pose):
+    try:
+        cap = cv2.VideoCapture(0)
+        pose_detect(cap, assigned_pose)
+        cap.release()
+        cv2.destroyAllWindows()
+        return 0
+    except:
+        cv2.VideoCapture(0).release()
+        cv2.destroyAllWindows()
+        return 0
+
+# DANCE_DETECT 함수를 호출하는 함수
+def call_dance_func():
+    try:
+        dance_cap = cv2.VideoCapture(0)
+        compare_positions('static/dance_video.mp4', dance_cap, keyp_list)
+        dance_cap.release()
+        cv2.destroyAllWindows()
+        return 0
+    except:
+        cv2.VideoCapture(0).release()
+        cv2.destroyAllWindows()
+        return 0
+
 def sleep_detect(image):
     global YAWN_STATUS
     global grayImage
@@ -106,29 +132,13 @@ def sleep_detect(image):
         if YAWN_COUNTER == 3:
             # client_socket.sendall("졸음 깨기 1단계를 시작합니다.".encode())
             assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
-            try:
-                cap = cv2.VideoCapture(0)
-                pose_detect(cap, assigned_pose)
-                cap.release()
-                cv2.destroyAllWindows()
-                return 0
-            except:
-                cv2.VideoCapture(0).release()
-                cv2.destroyAllWindows()
-                return 0
+            call_pose_func(assigned_pose)
 
         elif YAWN_COUNTER == 5:
             # client_socket.sendall("졸음 깨기 2단계를 시작합니다.".encode())
-            try:
-                dance_cap = cv2.VideoCapture(0)
-                compare_positions('static/dance_video.mp4', dance_cap, keyp_list)
-                dance_cap.release()
-                cv2.destroyAllWindows()
-                return 0
-            except:
-                cv2.VideoCapture(0).release()
-                cv2.destroyAllWindows()
-                return 0
+            call_dance_func()
+
+        
 
 
 def get_landmarks(im):
