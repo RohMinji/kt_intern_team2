@@ -36,19 +36,12 @@ $('#start-btn').click(function (e) {
 $('video').on("play", function(e) {
     $.ajax({
         url: SY_EXIST_URL,
-        dataType: "json",
         method: "GET",
-        data: {
-            csrfmiddlewaretoken: CSRF_TOKEN,
-        },
         success: function (data) {
             console.log(data)
             if (data.sy_exist == 0) {
                 videoPause()
             } 
-            else if (data.sy_exist == 1) {
-                videoPlay()
-            }
         },
         error: function (error) {
             alert("에러가 발생했습니다.");

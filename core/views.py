@@ -67,7 +67,6 @@ class VideoCamera(object):
         except:
             TEMP_CAP.release()
             _, image = TEMP_CAP2.read()
-            print(image)
             sleep_detect(image)
         # jpeg encoding
         _, jpeg = cv2.imencode('.jpg', image)

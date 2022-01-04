@@ -41,9 +41,6 @@ DJANGO_APPS = [
 ]
 
 CUSTOM_APPS = [
-    # REST
-    "rest_framework",
-    "rest_framework_swagger",
     # APPS
     "recognitions",
     "core",
