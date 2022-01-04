@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import socket
 
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.resnet50 import preprocess_input
@@ -9,7 +10,10 @@ from django.http import StreamingHttpResponse, JsonResponse
 
 
 model = load_model('models/keras_model.h5', compile=False)
+
+
 model.summary()
+
 
 SY_COUNT = 0
 
@@ -31,7 +35,7 @@ def face_detect(cam, image):
 
     prediction = model.predict(x)
     predicted_class = np.argmax(prediction[0]) # 예측된 클래스 0, 1, 2
-    
+
     if predicted_class == 0:
         msg = "안녕하세요 승용님, 학습을 시작하겠습니다."
         SY_COUNT += 1
@@ -41,7 +45,8 @@ def face_detect(cam, image):
         
     elif predicted_class == 2:
         msg = ""
-    print(predicted_class)
+
+    ##print(predicted_class)
 
 def sy_detection(request):
     global SY_COUNT

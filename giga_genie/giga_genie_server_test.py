@@ -2,7 +2,7 @@
 import socket
 
 # 접속할 서버 주소. localhost 사용
-HOST = '127.0.0.1'
+HOST = '127.30.1.21'
 
 # 클라이언트 접속을 대기하는 포트 번호
 PORT = 8000       
@@ -36,17 +36,6 @@ print('Connected by', addr)
 
 # 무한루프를 돌면서 
 while True:
-
-    # 클라이언트가 보낸 메시지를 수신하기 위해 대기합니다. 
-    data = client_socket.recv(1024)
-
-    # 빈 문자열을 수신하면 루프를 중지합니다. 
-    if not data:
-        break
-
-
-    # 수신받은 문자열을 출력합니다.
-    print('Received from', addr, data.decode())
 
     # 받은 문자열을 다시 클라이언트로 전송해줍니다.(에코) 
     client_socket.sendall(data)
