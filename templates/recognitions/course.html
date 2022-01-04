@@ -16,9 +16,7 @@
         <div class="row" id="content">
             <div class="col">
                 <div>
-                    <video controls width=500 height=400>
-                        <source src="{% static 'course.mp4' %}" type="video/mp4">
-                    </video>
+                    <video src="{% static 'course.mp4' %}" width=500 height=400 controls id="course-player" muted></video>
                 </div>
                 <div class="text-center">
                     <button class ="btn btn-primary" id="btn-play" onclick="videoPlay()">Play</button>

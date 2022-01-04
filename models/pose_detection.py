@@ -11,7 +11,7 @@ from time import time
 import time
 import mediapipe as mp
 import matplotlib.pyplot as plt
-
+from joblib import load
 
 # Initializing mediapipe pose class.
 mp_pose = mp.solutions.pose
@@ -26,14 +26,13 @@ mp_drawing = mp.solutions.drawing_utils
 pose_video = mp_pose.Pose(static_image_mode = False, min_detection_confidence=0.5)
 
 # Curl counter variables
-assigned_pose = "Squat" # 이 부분 값 받는 걸로 바꿔주기
+assigned_pose = "Squat" # 원하는 포즈 선택
 
-model = keras.models.load_model('models/POSE_DETECTING_2021-12-31 11_41.h5') # 모델 잘 되는 걸로 변경필요
+model = load('models/POSE_MODEL.joblib')
 
 counter = 0
 stage = None
 label = "Stand"
-
 
 
 def detectPose(image, pose, display = True):

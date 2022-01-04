@@ -31,7 +31,7 @@ mp_holistic = mp.solutions.holistic
 
 # txt 불러오기
 temp = []
-f = open('static/waving_hands_keyplist3.txt', 'r')
+f = open('static/ppap_keyplist.txt', 'r')
 
 while True: 
     line = f.readline()
@@ -119,7 +119,7 @@ def sleep_detect(image):
             # client_socket.sendall("졸음 깨기 2단계를 시작합니다.".encode())
             try:
                 dance_cap = cv2.VideoCapture(0)
-                compare_positions('static/sample_dance2.mp4', dance_cap, keyp_list)
+                compare_positions('static/dance_video.mp4', dance_cap, keyp_list)
                 dance_cap.release()
                 cv2.destroyAllWindows()
                 return 0
