@@ -6,8 +6,46 @@
 		<h1>오늘의 공부</h1>
 		<title>HTML</title>
 	</head>
+	<script src="https://cdn.jsdelivr.net/npm/danfojs@0.3.3/lib/bundle.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 	<body>
-		<img src="{% static 'img/sleepGraph.png' %}" alt="My Image">
-        <img src="{% static 'img/text.png' %}" alt="My Image1">
+		<!-- <img src="{% static 'img/sleepGraph.png' %}" alt="My Image"> -->
+        <!-- <img src="{% static 'img/text.png' %}" alt="My Image1"> -->
+		<div>
+			오늘 수업을 듣는 동안 <br>
+			하품 <strong>{{cnt_yawn}}</strong> 회, 자리 비움 <strong>{{cnt_empty}}</strong> 초<br>
+			<br>
+			오늘의 댄스 점수: {{avg_score}}
+		</div>
+		<div id="sleepGraph"></div>
+		<canvas id="sleepChart" style="width:100%;max-width:600px"></canvas>
+
+		<script>
+			var xValues = {{ key|safe }};
+			var yValues = {{val}};
+			var cnt_yawn = {{cnt_yawn}};
+			var cnt_empty = {{cnt_empty}};
+			
+			new Chart("sleepChart", {
+			  type: "line",
+			  data: {
+				labels: xValues,
+				datasets: [{
+				  fill: false,
+				  lineTension: 0,
+				  backgroundColor: "rgba(0,0,255,1.0)",
+				  borderColor: "rgba(0,0,255,0.1)",
+				  data: yValues
+				}]
+			  },
+			  options: {
+				legend: {display: false},
+				scales: {
+				  yAxes: [{ticks: {min: 0, max: 7}}],
+				}
+			  }
+			});
+			</script>
 	</body>
 </html>
+	

@@ -13,6 +13,8 @@ from sklearn.preprocessing import Normalizer
 from numpy import dot
 from numpy.linalg import norm
 
+avg_score="None"
+
 # 코사인 유사도
 def findCosineSimilarity_1(A, B):
     return dot(A, B)/(norm(A)*norm(B))
@@ -26,6 +28,7 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
     
     key_ = 0
     tot_score=[]
+    
     len_tot=1
     with mp_holistic.Holistic(min_detection_confidence = 0.5, min_tracking_confidence = 0.5) as holistic:
         while cap.isOpened() and cam.isOpened():
@@ -114,7 +117,8 @@ def compare_positions(trainer_video, user_video, keyp_list, dim = (420,720)):
         cam.release()
         cap.release()
         cv2.destroyAllWindows()
-        print((sum(tot_score) / len_tot) * 100)
+        avg_score=(sum(tot_score) / len_tot) * 100
+        print(avg_score)
 #         print((sum(tot_score) / len(tot_score)) * 100)
         
 mp_drawing = mp.solutions.drawing_utils
