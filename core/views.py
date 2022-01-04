@@ -17,7 +17,7 @@ from models.face_detection import SY_COUNT, face_detect, sy_detection
 from models.sleep_detection import sleep_detect
 # from models.pose_detection import pose_detect
 
-
+"""
 # 접속할 서버 주소. localhost 사용
 HOST = '172.30.1.21'
 
@@ -47,6 +47,7 @@ client_socket, addr = server_socket.accept()
 
 # 접속한 클라이언트의 주소입니다.
 print('Connected by', addr)
+"""
 
 # Frame Generator
 def gen(camera):
@@ -70,8 +71,8 @@ class FaceCamera(object):
         cam = self.video
         face_detect(cam, image) # model function
         from models.face_detection import SY_COUNT
-        if SY_COUNT == 100:
-            client_socket.sendall("안녕하세요 승용님, 학습을 시작하겠습니다.".encode())
+        # if SY_COUNT == 100:
+        # client_socket.sendall("안녕하세요 승용님, 학습을 시작하겠습니다.".encode())
         _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
 
@@ -110,9 +111,9 @@ class VideoCamera(object):
             TEMP_CAP.release()
             _, image = TEMP_CAP2.read()
 
-        if YAWN_COUNTER == 5:
-            client_socket.sendall("수고하셨습니다, 영상을 다시 재생합니다.".encode())
-            YAWN_COUNTER = 6
+        # if YAWN_COUNTER == 5:
+        #     # client_socket.sendall("수고하셨습니다, 영상을 다시 재생합니다.".encode())
+        #     YAWN_COUNTER = 6
 
         # jpeg encoding
         _, jpeg = cv2.imencode('.jpg', image)

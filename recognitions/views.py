@@ -5,7 +5,6 @@ from matplotlib import pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
 
-from models.sleep_detection import dataCollection
 
 
 # Create your views here.
@@ -13,6 +12,7 @@ def course(request):
     return render(request, 'recognitions/course.html')
 
 def result(request):
+    from models.sleep_detection import dataCollection
     dataCollection()
 
     #하품 0 자리비움 1

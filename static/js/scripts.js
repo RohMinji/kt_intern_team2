@@ -14,7 +14,7 @@ function videoPause() {
 $('#start-btn').click(function (e) {
     e.preventDefault();
     $.ajax({
-        url: SY_URL,
+        url: SY_DETECT_URL,
         dataType: "json",
         success: function (data) {
             if (data.SY_COUNT >= 100) {
@@ -32,4 +32,19 @@ $('#start-btn').click(function (e) {
     });
 });
 
-// Sleep Detect => Course STOP
+// No Student Detect => Course STOP
+// $('video').on("play", function(e) {
+//     $.ajax({
+//         url: SY_EXIST_URL,
+//         method: "GET",
+//         success: function (data) {
+//             console.log(data)
+//             if (data.sy_exist == 0) {
+//                 videoPause()
+//             } 
+//         },
+//         error: function (error) {
+//             alert("에러가 발생했습니다.");
+//         }
+//     });
+// });
