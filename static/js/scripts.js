@@ -33,7 +33,7 @@ $('#start-btn').click(function (e) {
 });
 
 // No Student Detect => Course STOP
-function test(){
+function videoControl(){
     $.ajax({
         url: SY_EXIST_URL,
         method: "GET",
@@ -54,5 +54,5 @@ function test(){
 };
 
 $(document).ready(function(){
-    setInterval(test, 1000);
+    setInterval(videoControl, 1000);
 })
