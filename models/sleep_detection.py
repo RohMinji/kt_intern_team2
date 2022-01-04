@@ -61,7 +61,7 @@ def sleep_detect(image):
     global YAWN_COUNTER
     global EYE_CLOSED_COUNTER
     global client_socket
-    from core.views import client_socket
+    # from core.views import client_socket
 
     now = datetime.datetime.now()
     now = now.strftime('%H:%M:%S')
@@ -74,7 +74,7 @@ def sleep_detect(image):
     if len(faces)<1:
         txt_list.append([1,now])
         cv2.putText(image, "No Student", (50,450), cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
-        videoStop(len(faces)) # Course Video STOP
+        # videoStop(len(faces)) # Course Video STOP
     else:
         pass
 
@@ -109,7 +109,7 @@ def sleep_detect(image):
     if prev_yawn_status == True and YAWN_STATUS == False:
         YAWN_COUNTER += 1
         if YAWN_COUNTER == 3:
-            client_socket.sendall("졸음 깨기 1단계를 시작합니다.".encode())
+            # client_socket.sendall("졸음 깨기 1단계를 시작합니다.".encode())
             try:
                 cap = cv2.VideoCapture(0)
                 pose_detect(cap)
@@ -122,7 +122,7 @@ def sleep_detect(image):
                 return 0
 
         elif YAWN_COUNTER == 5:
-            client_socket.sendall("졸음 깨기 2단계를 시작합니다.".encode())
+            # client_socket.sendall("졸음 깨기 2단계를 시작합니다.".encode())
             try:
                 dance_cap = cv2.VideoCapture(0)
                 compare_positions('static/sample_dance2.mp4', dance_cap, keyp_list)
