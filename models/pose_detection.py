@@ -12,9 +12,6 @@ from joblib import load
 # Initializing mediapipe pose class
 mp_pose = mp.solutions.pose
 
-# Setting up the Pose function
-pose = mp_pose.Pose(static_image_mode = True, min_detection_confidence = 0.3)
-
 # Initializing mediapipe drawing class, useful for annotation
 mp_drawing = mp.solutions.drawing_utils
 
@@ -23,7 +20,6 @@ pose_video = mp_pose.Pose(static_image_mode = False, min_detection_confidence=0.
 
 # Curl counter variables
 model = load('models/POSE_MODEL.joblib')
-
 
 counter = 0
 stage = None
@@ -63,8 +59,10 @@ def calculateAngle(landmark1, landmark2, landmark3):
         angle += 360
     return angle
 
+
 # Evaluate User's Motion
 def pose_detect(cap, assigned_pose):
+    print("POSE DETECT FUNCTION START")
     global counter
     global stage
     global label
@@ -77,8 +75,11 @@ def pose_detect(cap, assigned_pose):
             
             image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image.flags.writeable = False
+            image = cv2.flip(image, 1)
+            
+            # Make detection
             results = pose.process(image)
-            image.flags.writeable = True
+            image.flags.writeable = False
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             
             # Calculate the required angles
@@ -121,11 +122,12 @@ def pose_detect(cap, assigned_pose):
                 
                 if Time + 5 < time.time():
                     if label == "Stand":
-                        stage = "down"
                         if counter == 3:
                             cap.release()
                             cv2.destroyAllWindows()
                             break
+                        else:
+                            stage = "down"
 
                     if label == assigned_pose and stage =='down':
                         time.sleep(0.2)

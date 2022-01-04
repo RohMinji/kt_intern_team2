@@ -21,6 +21,7 @@ EYE_CLOSED_COUNTER=0
 BLINK_COUNT=0
 YAWN_COUNTER = 0
 YAWN_STATUS = False
+STAGE = 0
 
 detector = dlib.get_frontal_face_detector() # 얼굴인식
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #랜드마크 추출
@@ -52,6 +53,33 @@ eyesize_dic={}
 #자리비운시각dict
 empty_dic={}
 
+# POSE_DETECT 함수를 호출하는 함수
+def call_pose_func():
+    assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
+    try:
+        cap = cv2.VideoCapture(0)
+        pose_detect(cap, assigned_pose)
+        cap.release()
+        cv2.destroyAllWindows()
+        return 0
+    except:
+        cv2.VideoCapture(0).release()
+        cv2.destroyAllWindows()
+        return 0
+
+# DANCE_DETECT 함수를 호출하는 함수
+def call_dance_func():
+    try:
+        dance_cap = cv2.VideoCapture(0)
+        compare_positions('static/dance_video.mp4', dance_cap, keyp_list)
+        dance_cap.release()
+        cv2.destroyAllWindows()
+        return 0
+    except:
+        cv2.VideoCapture(0).release()
+        cv2.destroyAllWindows()
+        return 0
+
 def sleep_detect(image):
     global YAWN_STATUS
     global grayImage
@@ -59,6 +87,7 @@ def sleep_detect(image):
     global YAWN_COUNTER
     global EYE_CLOSED_COUNTER
     global client_socket
+    global STAGE
     # from core.views import client_socket
 
     now = datetime.datetime.now()
@@ -69,7 +98,7 @@ def sleep_detect(image):
     grayImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     faces = detector(grayImage, 0)
 
-    if len(faces)<1:
+    if len(faces) < 1:
         empty_dic[now] = 1
         eyesize_dic[now] = 0
         cv2.putText(image, "No Student", (50,450), cv2.FONT_HERSHEY_DUPLEX, 1.5, (0,0,255), 2)
@@ -89,7 +118,7 @@ def sleep_detect(image):
         if EYE_CLOSED_COUNTER >= MAXIMUM_FRAME_COUNT:
             cv2.putText(image, "Sleep", (10, 60), cv2.FONT_HERSHEY_DUPLEX, 1.2, (0, 0, 255), 2)
             BLINK_COUNT += 1
-            cv2.putText(image, "Count: {}".format(int((BLINK_COUNT)/5)), (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1.2, (0, 0, 255), 2)
+            cv2.putText(image, "Count: {}".format(int((BLINK_COUNT) / 5)), (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1.2, (0, 0, 255), 2)
     
     prev_yawn_status = YAWN_STATUS
     if lip_distance > 25:
@@ -103,32 +132,25 @@ def sleep_detect(image):
         
     if prev_yawn_status == True and YAWN_STATUS == False:
         YAWN_COUNTER += 1
-        if YAWN_COUNTER == 3:
+        if YAWN_COUNTER == 3 and STAGE == 0:
             # client_socket.sendall("졸음 깨기 1단계를 시작합니다.".encode())
-            assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
-            try:
-                cap = cv2.VideoCapture(0)
-                pose_detect(cap, assigned_pose)
-                cap.release()
-                cv2.destroyAllWindows()
-                return 0
-            except:
-                cv2.VideoCapture(0).release()
-                cv2.destroyAllWindows()
-                return 0
+            STAGE = 1
+            call_pose_func()
 
-        elif YAWN_COUNTER == 5:
+        elif YAWN_COUNTER == 5 and STAGE == 1:
             # client_socket.sendall("졸음 깨기 2단계를 시작합니다.".encode())
-            try:
-                dance_cap = cv2.VideoCapture(0)
-                compare_positions('static/dance_video.mp4', dance_cap, keyp_list)
-                dance_cap.release()
-                cv2.destroyAllWindows()
-                return 0
-            except:
-                cv2.VideoCapture(0).release()
-                cv2.destroyAllWindows()
-                return 0
+            STAGE = 2
+            call_dance_func()
+    elif int((BLINK_COUNT) / 5) == 3 and STAGE == 0:
+        # client_socket.sendall("졸음 깨기 1단계를 시작합니다.".encode())
+        STAGE = 1
+        call_pose_func()
+    elif int((BLINK_COUNT) / 5) == 6 and STAGE == 1:
+        # client_socket.sendall("졸음 깨기 2단계를 시작합니다.".encode())
+        STAGE = 2
+        call_dance_func()
+
+        
 
 
 def get_landmarks(im):
