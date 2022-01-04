@@ -7,7 +7,6 @@ import time
 import mediapipe as mp
 import matplotlib.pyplot as plt
 import random
-from time import time
 from joblib import load
 
 # Initializing mediapipe pose class
