@@ -9,7 +9,6 @@ from django.http import JsonResponse
 import mediapipe as mp
 import random
 
-# from core.views import pose_detection
 from models.pose_detection import pose_detect
 from models.dance_detection import compare_positions
 
