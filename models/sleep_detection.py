@@ -1,37 +1,37 @@
 import cv2
 import dlib
-from imutils import face_utils
 import numpy as np
-from scipy.spatial import distance as dist
 import datetime
-import pandas as pd
-from django.http import JsonResponse
 import mediapipe as mp
 import random
 
-# from core.views import pose_detection
+from imutils import face_utils
+from scipy.spatial import distance as dist
+from django.http import JsonResponse
+
 from models.pose_detection import pose_detect
 from models.dance_detection import compare_positions
 
-# from models.pose_detection import detectPose
-
-MINIMUM_EAR = 0.2
 MAXIMUM_FRAME_COUNT = 3
+MINIMUM_EAR = 0.2
 EYE_CLOSED_COUNTER=0
 BLINK_COUNT=0
 YAWN_COUNTER = 0
 YAWN_STATUS = False
 STAGE = 0
 
-detector = dlib.get_frontal_face_detector() # 얼굴인식
-predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #랜드마크 추출
+# Load Face Detector, Predictor
+detector = dlib.get_frontal_face_detector() 
+predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+
+# Get Coordinates of Eyes 
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rightEyeStart, rightEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
+# Call Module for Media Pipe
 mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
 
-# txt 불러오기
 temp = []
 f = open('static/ppap_keyplist.txt', 'r')
 
@@ -48,9 +48,10 @@ for i in range(len(temp)):
     keyp_list.append(list(map(int, temp[i])))
 
 
-#눈크기값dict
+# Dictionary -> Size of Eyes
 eyesize_dic={}
-#자리비운시각dict
+
+# Dictionary -> Duration of Vacancy
 empty_dic={}
 
 # POSE_DETECT 함수를 호출하는 함수
@@ -79,6 +80,7 @@ def call_dance_func():
         cv2.destroyAllWindows()
         return 0
 
+
 def sleep_detect(image):
     global YAWN_STATUS
     global grayImage
@@ -89,46 +91,63 @@ def sleep_detect(image):
     global STAGE
     # from core.views import client_socket
 
+    # Get Current Time
     now = datetime.datetime.now()
     now = now.strftime("%H:%M:%S")
     now = str(now)
 
+    # Preprocessing -Gray Scale
     image_landmarks, lip_distance = mouth_open(image)
     grayImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     faces = detector(grayImage, 0)
 
-    if len(faces) < 1:
+    # Detect User's Vacancy
+    if len(faces)<1:
         empty_dic[now] = 1
         eyesize_dic[now] = 0
-        cv2.putText(image, "No Student", (50,450), cv2.FONT_HERSHEY_DUPLEX, 1.5, (0,0,255), 2)
+        cv2.putText(image, "No Student", (50,450), cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
         # videoStop(len(faces)) # Course Video STOP
     else:
         pass
-
+    
+    # Detect User's Drowsiness
     for face in faces:
+
+        # Calculate ear(Eyes Angle Ratio)
         ear= calEAR(face, image)
+
+        # Collect ear Data 
         eyesize_dic[now]=1/ear
         if ear < MINIMUM_EAR:
+
+            # Count Eye Closed Time
             EYE_CLOSED_COUNTER += 1
         else:
-            EYE_CLOSED_COUNTER = 0
-        #cv2.putText(frame, "EAR: {}".format(round(ear, 1)), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
+            # Initalize Count
+            EYE_CLOSED_COUNTER = 0
+
+        # Catch Drowsiness
         if EYE_CLOSED_COUNTER >= MAXIMUM_FRAME_COUNT:
-            cv2.putText(image, "Sleep", (10, 60), cv2.FONT_HERSHEY_DUPLEX, 1.2, (0, 0, 255), 2)
+            cv2.putText(image, "Drowsiness", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
             BLINK_COUNT += 1
-            cv2.putText(image, "Count: {}".format(int((BLINK_COUNT) / 5)), (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1.2, (0, 0, 255), 2)
+            cv2.putText(image, "Count: {}".format(int((BLINK_COUNT)/5)), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     
+    # Detect User's Yawning
     prev_yawn_status = YAWN_STATUS
+    
+    # Catch Yawning
     if lip_distance > 25:
         YAWN_STATUS = True 
     
         output_text = " Yawn Count: " + str(YAWN_COUNTER + 1)
-        cv2.putText(image, output_text, (50, 50),
-                cv2.FONT_HERSHEY_DUPLEX, 1.2, (0,255,127), 2)
+
+        cv2.putText(image, output_text, (50,50),
+                cv2.FONT_HERSHEY_COMPLEX, 1,(0,255,127),2)
     else:
         YAWN_STATUS = False 
-        
+
+    # Check User Status for Next Step
     if prev_yawn_status == True and YAWN_STATUS == False:
         YAWN_COUNTER += 1
         if YAWN_COUNTER == 3 and STAGE == 0:
@@ -157,7 +176,7 @@ def sleep_detect(image):
 
         
 
-
+# Get 68 Face Landmarks
 def get_landmarks(im):
     rects = detector(im, 1)
 
@@ -167,7 +186,7 @@ def get_landmarks(im):
         return "error"
     return np.matrix([[p.x, p.y] for p in predictor(im, rects[0]).parts()])
 
-
+# Get EAR of Each Eye
 def eye_aspect_ratio(eye):
     p2_minus_p6 = dist.euclidean(eye[1], eye[5])
     p3_minus_p5 = dist.euclidean(eye[2], eye[4])
@@ -175,19 +194,15 @@ def eye_aspect_ratio(eye):
     ear = (p2_minus_p6 + p3_minus_p5) / (2.0 * p1_minus_p4)
     return ear
 
-
+# Return Marked Image
 def annotate_landmarks(im, landmarks):
     im = im.copy()
     for idx, point in enumerate(landmarks):
         pos = (point[0, 0], point[0, 1])
-        cv2.putText(im, str(idx), pos,
-                    fontFace=cv2.FONT_HERSHEY_DUPLEX,
-                    fontScale=0.4,
-                    color=(0, 0, 255))
         cv2.circle(im, pos, 3, color=(0, 255, 255))
     return im
 
-
+# Get landmark of top lip
 def top_lip(landmarks):
     top_lip_pts = []
     for i in range(50,53):
@@ -198,7 +213,7 @@ def top_lip(landmarks):
     top_lip_mean = np.mean(top_lip_pts, axis=0)
     return int(top_lip_mean[:,1])
 
-
+# Get landmark of bottom lip
 def bottom_lip(landmarks):
     bottom_lip_pts = []
     for i in range(65,68):
@@ -209,7 +224,7 @@ def bottom_lip(landmarks):
     bottom_lip_mean = np.mean(bottom_lip_pts, axis=0)
     return int(bottom_lip_mean[:,1])
 
-
+# Get distance of lip top and lip bottom
 def mouth_open(imagee):
     landmarks = get_landmarks(imagee)
     
@@ -222,7 +237,7 @@ def mouth_open(imagee):
     lip_distance = abs(top_lip_center - bottom_lip_center)
     return image_with_landmarks, lip_distance
 
-
+# Get mean of Left & Right EAR
 def calEAR(face, image):
     faceLandmarks = predictor(grayImage, face)
     faceLandmarks = face_utils.shape_to_np(faceLandmarks)
@@ -243,6 +258,7 @@ def calEAR(face, image):
     
     return ear
 
+# Stop Video If There's No Student
 def videoStop(sy_exist):
     data = {
         "sy_exist": sy_exist,
