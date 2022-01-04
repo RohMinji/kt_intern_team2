@@ -7,7 +7,7 @@ from tensorflow.keras.preprocessing.image import img_to_array
 from django.http import JsonResponse
 
 # Loading User's model
-model = load_model('models/keras_model.h5', compile=False)
+model = load_model('models/FACE_MODEL.h5', compile=False)
 model.summary()
 
 # Counting the number of frames to identify user

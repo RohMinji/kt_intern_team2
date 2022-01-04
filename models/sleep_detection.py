@@ -8,6 +8,7 @@ import pandas as pd
 from django.http import JsonResponse
 import mediapipe as mp
 import random
+import json
 
 # from core.views import pose_detection
 from models.pose_detection import pose_detect
@@ -22,6 +23,7 @@ BLINK_COUNT=0
 YAWN_COUNTER = 0
 YAWN_STATUS = False
 STAGE = 0
+sy_exist = 0
 
 detector = dlib.get_frontal_face_detector() # 얼굴인식
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #랜드마크 추출
@@ -54,8 +56,7 @@ eyesize_dic={}
 empty_dic={}
 
 # POSE_DETECT 함수를 호출하는 함수
-def call_pose_func():
-    assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
+def call_pose_func(assigned_pose):
     try:
         cap = cv2.VideoCapture(0)
         pose_detect(cap, assigned_pose)
@@ -88,6 +89,7 @@ def sleep_detect(image):
     global EYE_CLOSED_COUNTER
     global client_socket
     global STAGE
+    global sy_exist
     # from core.views import client_socket
 
     now = datetime.datetime.now()
@@ -97,12 +99,11 @@ def sleep_detect(image):
     image_landmarks, lip_distance = mouth_open(image)
     grayImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     faces = detector(grayImage, 0)
-
+    sy_exist = len(faces)
     if len(faces) < 1:
         empty_dic[now] = 1
         eyesize_dic[now] = 0
         cv2.putText(image, "No Student", (50,450), cv2.FONT_HERSHEY_DUPLEX, 1.5, (0,0,255), 2)
-        # videoStop(len(faces)) # Course Video STOP
     else:
         pass
 
@@ -133,20 +134,26 @@ def sleep_detect(image):
     if prev_yawn_status == True and YAWN_STATUS == False:
         YAWN_COUNTER += 1
         if YAWN_COUNTER == 3 and STAGE == 0:
+            assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
             # client_socket.sendall("졸음 깨기 1단계를 시작합니다.".encode())
+            # client_socket.sendall(str(assigned_pose) + "를 3회 시행해주세요.".encode())
             STAGE = 1
-            call_pose_func()
+            call_pose_func(assigned_pose)
 
         elif YAWN_COUNTER == 5 and STAGE == 1:
             # client_socket.sendall("졸음 깨기 2단계를 시작합니다.".encode())
+            # client_socket.sendall("음악에 맞춰 춤을 춰주세요.".encode())
             STAGE = 2
             call_dance_func()
     elif int((BLINK_COUNT) / 5) == 3 and STAGE == 0:
+        assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
         # client_socket.sendall("졸음 깨기 1단계를 시작합니다.".encode())
+        # client_socket.sendall(str(assigned_pose) + "를 3회 시행해주세요.".encode())
         STAGE = 1
-        call_pose_func()
+        call_pose_func(assigned_pose)
     elif int((BLINK_COUNT) / 5) == 6 and STAGE == 1:
         # client_socket.sendall("졸음 깨기 2단계를 시작합니다.".encode())
+        # client_socket.sendall("음악에 맞춰 춤을 춰주세요.".encode())
         STAGE = 2
         call_dance_func()
 
@@ -238,7 +245,8 @@ def calEAR(face, image):
     
     return ear
 
-def videoStop(sy_exist):
+def videoStop(request):
+    global sy_exist
     data = {
         "sy_exist": sy_exist,
     }
