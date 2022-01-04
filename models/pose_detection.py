@@ -1,6 +1,4 @@
 # 필요한 모듈 호출
-
-
 import os
 import math
 import keras
@@ -12,6 +10,7 @@ import time
 import mediapipe as mp
 import matplotlib.pyplot as plt
 from joblib import load
+import random
 
 # Initializing mediapipe pose class.
 mp_pose = mp.solutions.pose
@@ -26,7 +25,7 @@ mp_drawing = mp.solutions.drawing_utils
 pose_video = mp_pose.Pose(static_image_mode = False, min_detection_confidence=0.5)
 
 # Curl counter variables
-assigned_pose = "Squat" # 원하는 포즈 선택
+
 
 model = load('models/POSE_MODEL.joblib')
 
@@ -103,13 +102,14 @@ def calculateAngle(landmark1, landmark2, landmark3):
     return angle
 
 
-def pose_detect(cap):
+def pose_detect(cap, assigned_pose):
     global counter
     global stage
     global label
 
     ## Setup mediapipe instance
     with mp_pose.Pose(min_detection_confidence = 0.5, min_tracking_confidence = 0.5) as pose:
+        Time = time.time()
         while cap.isOpened():
             ret, frame = cap.read()
             
@@ -163,18 +163,21 @@ def pose_detect(cap):
                 target_names = ['Lunge', 'Squat', 'Stand', 'stretch'] ## 추가
                 label = target_names[np.argmax(model.predict(pd.DataFrame([left_elbow_angle, right_elbow_angle, left_shoulder_angle, right_shoulder_angle, left_knee_angle, right_knee_angle]).T))]
                 
-                # Curl counter logic
-                if label == "Stand":
-                    stage = "down"
-                    if counter == 3:
-                        cap.release()
-                        cv2.destroyAllWindows()
-                        break
-                if label == assigned_pose and stage =='down':
-                    time.sleep(0.2)
-                    counter += 1
-                    stage = "up"
-                    time.sleep(0.3)
+                if Time + 5 < time.time():
+                    # Curl counter logic
+                    if label == "Stand":
+                        stage = "down"
+                        if counter == 3:
+                            cap.release()
+                            cv2.destroyAllWindows()
+                            break
+                    if label == assigned_pose and stage =='down':
+                        time.sleep(0.2)
+                        counter += 1
+                        stage = "up"
+                        time.sleep(0.3)
+                else:
+                    pass
             except:
                 pass
             

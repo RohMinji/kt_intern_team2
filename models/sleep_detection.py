@@ -7,6 +7,7 @@ import datetime
 import pandas as pd
 from django.http import JsonResponse
 import mediapipe as mp
+import random
 
 # from core.views import pose_detection
 from models.pose_detection import pose_detect
@@ -70,6 +71,7 @@ def sleep_detect(image):
 
     if len(faces)<1:
         empty_dic[now] = 1
+        eyesize_dic[now] = 0
         cv2.putText(image, "No Student", (50,450), cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
         # videoStop(len(faces)) # Course Video STOP
     else:
@@ -104,9 +106,10 @@ def sleep_detect(image):
         YAWN_COUNTER += 1
         if YAWN_COUNTER == 3:
             # client_socket.sendall("졸음 깨기 1단계를 시작합니다.".encode())
+            assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
             try:
                 cap = cv2.VideoCapture(0)
-                pose_detect(cap)
+                pose_detect(cap, assigned_pose)
                 cap.release()
                 cv2.destroyAllWindows()
                 return 0
