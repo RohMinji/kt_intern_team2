@@ -33,18 +33,26 @@ $('#start-btn').click(function (e) {
 });
 
 // No Student Detect => Course STOP
-// $('video').on("play", function(e) {
-//     $.ajax({
-//         url: SY_EXIST_URL,
-//         method: "GET",
-//         success: function (data) {
-//             console.log(data)
-//             if (data.sy_exist == 0) {
-//                 videoPause()
-//             } 
-//         },
-//         error: function (error) {
-//             alert("에러가 발생했습니다.");
-//         }
-//     });
-// });
+function test(){
+    $.ajax({
+        url: SY_EXIST_URL,
+        method: "GET",
+        dataType: "json",
+        success: function (data) {
+            console.log(data)
+            if (data.sy_exist == 0) {
+                videoPause()
+            } 
+            else {
+                videoPlay()
+            }
+        },
+        error: function (error) {
+            alert("에러가 발생했습니다.");
+        }
+    });
+};
+
+$(document).ready(function(){
+    setInterval(test, 1000);
+})
