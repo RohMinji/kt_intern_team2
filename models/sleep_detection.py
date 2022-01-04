@@ -32,27 +32,8 @@ predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #랜�
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rightEyeStart, rightEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
-mp_drawing = mp.solutions.drawing_utils
-mp_holistic = mp.solutions.holistic
-
-# txt 불러오기
-temp = []
-f = open('static/waving_hands_keyplist3.txt', 'r')
-
-while True: 
-    line = f.readline()
-    if not line: break
-    line = line.replace("\n","")  
-    temp.append(list(map(str, line.split(" ")))[:-1])    
-    
-f.close()
-
-keyp_list = []
-for i in range(len(temp)):
-    keyp_list.append(list(map(int, temp[i])))
-
-img_list=[]
-txt_list=[]
+img_list={}
+txt_list={}
 
 def sleep_detect(image):
     global YAWN_STATUS
@@ -64,7 +45,7 @@ def sleep_detect(image):
     # from core.views import client_socket
 
     now = datetime.datetime.now()
-    now = now.strftime('%H:%M:%S')
+    now = now.strftime("%H:%M:%S")
     now = str(now)
 
     image_landmarks, lip_distance = mouth_open(image)
@@ -80,7 +61,7 @@ def sleep_detect(image):
 
     for face in faces:
         ear= calEAR(face, image)
-        img_list.append([1/ear,now])
+        img_list[now]=1/ear
         if ear < MINIMUM_EAR:
             EYE_CLOSED_COUNTER += 1
         else:
@@ -93,8 +74,9 @@ def sleep_detect(image):
             cv2.putText(image, "Count: {}".format(int((BLINK_COUNT)/5)), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     
     prev_yawn_status = YAWN_STATUS
-    if lip_distance > 25:
-        txt_list.append([0,now])
+    if lip_distance>25:
+        #txt_list.append([now,0])
+        txt_list[now]=0
         YAWN_STATUS = True 
     #cv2.putText(frame, "Subject is Yawning", (50,450), 
     #           cv2.FONT_HERSHEY_COMPLEX, 1,(0,0,255),2)
@@ -137,18 +119,6 @@ def sleep_detect(image):
 def dataCollection():
     imgDF=pd.read_csv('static/data/imgDF.csv')
     txtDF=pd.read_csv('static/data/txtDF.csv')
-
-    new_imgDF= pd.DataFrame(img_list)
-    new_txtDF= pd.DataFrame(txt_list)
-
-    new_imgDF.columns=['ear','time']
-    new_txtDF.columns=['label','time']
-
-    imgDF = pd.concat([imgDF,new_imgDF])
-    txtDF = pd.concat([txtDF,new_txtDF])
-
-    imgDF.to_csv('static/data/imgDF.csv',header=True, index=False)
-    txtDF.to_csv('static/data/txtDF.csv',header=True, index=False)
 
 def get_landmarks(im):
     rects = detector(im, 1)

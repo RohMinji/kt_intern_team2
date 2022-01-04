@@ -1,136 +1,51 @@
-<!-- Styles -->
-<style>
-	#chartdiv {
-	  width: 100%;
-	  height: 500px;
-	max-width: 100%
-	}
-	</style>
+{% load static %}
+<!doctype html>
+<html lang="ko">
+	<head>
+	<meta charset="utf-8">
+		<h1>오늘의 공부</h1>
+		<title>HTML</title>
+	</head>
+	<script src="https://cdn.jsdelivr.net/npm/danfojs@0.3.3/lib/bundle.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+	<body>
+		<!-- <img src="{% static 'img/sleepGraph.png' %}" alt="My Image"> -->
+        <!-- <img src="{% static 'img/text.png' %}" alt="My Image1"> -->
+		<div>
+			오늘 수업을 듣는 동안 <br>
+			하품 <strong>{{cnt_yawn}}</strong> 회, 자리 비움 <strong>{{cnt_empty}}</strong> 초<br>
+			<br>
+			오늘의 댄스 점수: {{avg_score}}
+		</div>
+		<div id="sleepGraph"></div>
+		<canvas id="sleepChart" style="width:100%;max-width:600px"></canvas>
+
+		<script>
+			var xValues = {{ key|safe }};
+			var yValues = {{val}};
+			var cnt_yawn = {{cnt_yawn}};
+			var cnt_empty = {{cnt_empty}};
+			
+			new Chart("sleepChart", {
+			  type: "line",
+			  data: {
+				labels: xValues,
+				datasets: [{
+				  fill: false,
+				  lineTension: 0,
+				  backgroundColor: "rgba(0,0,255,1.0)",
+				  borderColor: "rgba(0,0,255,0.1)",
+				  data: yValues
+				}]
+			  },
+			  options: {
+				legend: {display: false},
+				scales: {
+				  yAxes: [{ticks: {min: 0, max: 7}}],
+				}
+			  }
+			});
+			</script>
+	</body>
+</html>
 	
-	<!-- Resources -->
-	<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-	<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-	<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-	
-	<!-- Chart code -->
-	<script>
-	am5.ready(function() {
-	
-	// Create root element
-	// https://www.amcharts.com/docs/v5/getting-started/#Root_element
-	var root = am5.Root.new("chartdiv");
-	
-	
-	
-	// Set themes
-	// https://www.amcharts.com/docs/v5/concepts/themes/
-	root.setThemes([
-	  am5themes_Animated.new(root)
-	]);
-	
-	
-	// Create chart
-	// https://www.amcharts.com/docs/v5/charts/xy-chart/
-	var chart = root.container.children.push(am5xy.XYChart.new(root, {
-	  panX: true,
-	  panY: true,
-	  wheelX: "panX",
-	  wheelY: "zoomX"
-	}));
-	
-	
-	// Add cursor
-	// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-	var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
-	  behavior: "none"
-	}));
-	cursor.lineY.set("visible", false);
-	
-	
-	// Generate random data
-	
-	// var date = new Date();
-	// date.setHours(0, 0, 0, 0);
-	// var value = 100;
-	const dfd = require("danfojs-node");
-	function generateData() {
-	  //value = Math.round((Math.random() * 10 - 5) + value);
-	  dfd.read_csv('.static/data/imgDF.csv') //assumes file is in CWD
-	  .then(df => {
-	  
-	   df.head().print()
-	
-	  }).catch(err=>{
-		 console.log(err);
-	  })
-	  var date =df['time']
-	  var value = df['ear']
-	  am5.time.add(date, "time", 1);
-	  return {
-		date: date,
-		value: value
-	  };
-	}
-	
-	function generateDatas(count) {
-	  var data = [];
-	  for (var i = 0; i < count; ++i) {
-		data.push(generateData());
-	  }
-	  return data;
-	}
-	
-	
-	// Create axes
-	// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-	var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
-	  maxDeviation: 0.2,
-	  baseInterval: {
-		timeUnit: "time",
-		count: 1
-	  },
-	  renderer: am5xy.AxisRendererX.new(root, {}),
-	  tooltip: am5.Tooltip.new(root, {})
-	}));
-	
-	var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-	  renderer: am5xy.AxisRendererY.new(root, {})
-	}));
-	
-	
-	// Add series
-	// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-	var series = chart.series.push(am5xy.LineSeries.new(root, {
-	  name: "Series",
-	  xAxis: xAxis,
-	  yAxis: yAxis,
-	  valueYField: "ear",
-	  valueXField: "time",
-	  tooltip: am5.Tooltip.new(root, {
-		labelText: "{valueY}"
-	  })
-	}));
-	
-	
-	// Add scrollbar
-	// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
-	chart.set("scrollbarX", am5.Scrollbar.new(root, {
-	  orientation: "horizontal"
-	}));
-	
-	
-	// Set data
-	var data = generateDatas(1200);
-	series.data.setAll(data);
-	
-	
-	// Make stuff animate on load
-	// https://www.amcharts.com/docs/v5/concepts/animations/
-	series.appear(1000);
-	chart.appear(1000, 100);
-	
-	}); // end am5.ready()
-	</script>
-	
-	<!-- HTML -->
-	<div id="chartdiv"></div>
