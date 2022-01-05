@@ -10,22 +10,41 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{% static 'css/core/style.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700&display=swap" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 1800px !important;
+            margin-top: 10rem;
+        }
+        img {
+            width: 100%;
+        }
+        a {
+            color: inherit; /* blue colors for links too */
+            text-decoration: inherit; /* no underline */
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-4">
+    <div class="container">
         <div class="row" id="content">
             <div class="col">
-                <div>
-                    <video src="{% static 'course.mp4' %}" width=500 height=400 controls id="course-player" muted></video>
+                <div class="text-center">
+                    <video src="{% static 'course.mp4' %}" width=700 height=500 controls id="course-player" muted></video>
                 </div>
                 <div class="text-center">
-                    <button class ="btn btn-primary" id="btn-play" onclick="videoPlay()">Play</button>
-                    <button class ="btn btn-danger" id="btn-pause" onclick="videoPause()">Pause</button>
-                    <a href="{% url 'recognitions:result' %}">Result</a>
+                    <button class ="btn btn-primary" id="btn-play" onclick="videoPlay()">재생</button>
+                    <button class ="btn btn-danger" id="btn-pause" onclick="videoPause()">정지</button>
+                    <button type="button" class="btn btn-light">
+                        <a href="{% url 'recognitions:result' %}">RESULT</a>
+                    </button>
                 </div>
             </div>
             <div class="col text-center">
-                <img id="cam-img" src="http://127.0.0.1:8000/cam" style="width: 400px;" alt="" srcset="">
+                <img id="cam-img" src="http://127.0.0.1:8000/cam" alt="" srcset="">
             </div>
         </div>
     </div>

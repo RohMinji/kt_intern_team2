@@ -64,6 +64,7 @@ class FaceCamera(object):
         # Call GiGA-Genie        
         if SY_COUNT == 100:
             client_socket.sendall("안녕하세요 승용님, 학습을 시작하겠습니다.".encode())
+            SY_COUNT = 101
 
         _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
@@ -97,16 +98,13 @@ class VideoCamera(object):
         if type(image) != np.ndarray:
             _, image = TEMP_CAP.read()
         try:
+            image = cv2.flip(image, 1)
             sleep_detect(image)
         except:
             TEMP_CAP.release()
             _, image = TEMP_CAP2.read()
+            image = cv2.flip(image, 1)
             sleep_detect(image)
-
-        # Call GiGA-Genie
-        if YAWN_COUNTER == 5:
-            client_socket.sendall("수고하셨습니다, 영상을 다시 재생합니다.".encode())
-            YAWN_COUNTER = 6
 
         _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
