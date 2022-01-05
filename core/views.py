@@ -56,6 +56,7 @@ class FaceCamera(object):
     def get_frame(self):
         global SY_COUNT
         image = self.frame
+        image = cv2.flip(image, 1)
         cam = self.video
 
         # Execute Face Detection
