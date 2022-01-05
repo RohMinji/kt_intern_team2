@@ -6,6 +6,8 @@ from tensorflow.keras.applications.resnet50 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from django.http import JsonResponse
 
+
+
 # Loading User's model
 model = load_model('models/FACE_MODEL.h5', compile=False)
 model.summary()

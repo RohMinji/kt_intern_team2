@@ -1,6 +1,7 @@
 import cv2
 import threading
 import numpy as np
+import socket
 
 # Django
 from django.shortcuts import render
@@ -11,12 +12,11 @@ from django.http import StreamingHttpResponse
 from models.face_detection import SY_COUNT, face_detect, sy_detection
 from models.sleep_detection import sleep_detect
 
-"""
 # Use server address. localhost
-HOST = '172.30.1.21'
+HOST = '172.30.1.26'
 
 # PORT Number
-PORT = 9999       
+PORT = 9999
 
 # Generate Socket Object
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -35,7 +35,7 @@ client_socket, addr = server_socket.accept()
 
 # Client Address
 print('Connected by', addr)
-"""
+
 
 # Frame Generator
 def gen(camera):
@@ -60,9 +60,11 @@ class FaceCamera(object):
         # Execute Face Detection
         face_detect(cam, image) # model function
         from models.face_detection import SY_COUNT
+
         # Call GiGA-Genie        
-        # if SY_COUNT == 100:
-        # client_socket.sendall("안녕하세요 승용님, 학습을 시작하겠습니다.".encode())
+        if SY_COUNT == 100:
+            client_socket.sendall("안녕하세요 승용님, 학습을 시작하겠습니다.".encode())
+
         _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
 
@@ -100,10 +102,11 @@ class VideoCamera(object):
             TEMP_CAP.release()
             _, image = TEMP_CAP2.read()
             sleep_detect(image)
+
         # Call GiGA-Genie
-        # if YAWN_COUNTER == 5:
-        #     # client_socket.sendall("수고하셨습니다, 영상을 다시 재생합니다.".encode())
-        #     YAWN_COUNTER = 6
+        if YAWN_COUNTER == 5:
+            client_socket.sendall("수고하셨습니다, 영상을 다시 재생합니다.".encode())
+            YAWN_COUNTER = 6
 
         _, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
