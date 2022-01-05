@@ -160,6 +160,7 @@ def sleep_detect(image):
             videoValue += 1
             call_dance_func()
             videoValue = 0
+
     elif int((BLINK_COUNT) / 5) == 3 and STAGE == 0:
         assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
         if assigned_pose == "Squat":
@@ -171,6 +172,7 @@ def sleep_detect(image):
         time.sleep(1)
         call_pose_func(assigned_pose)
         videoValue = 0
+        
     elif int((BLINK_COUNT) / 5) == 6 and STAGE == 1:
         videoValue = 1
         client_socket.sendall("졸음 깨기 2단계를 시작합니다. 음악에 맞춰 춤을 춰주세요.".encode())
