@@ -1,7 +1,7 @@
 import cv2
 import threading
 import numpy as np
-import socket
+# import socket
 
 # Django
 from django.shortcuts import render
@@ -12,6 +12,7 @@ from django.http import StreamingHttpResponse
 from models.face_detection import SY_COUNT, face_detect, sy_detection
 from models.sleep_detection import sleep_detect
 
+"""
 # Use server address. localhost
 HOST = '172.30.1.26'
 
@@ -35,6 +36,7 @@ client_socket, addr = server_socket.accept()
 
 # Client Address
 print('Connected by', addr)
+"""
 
 
 # Frame Generator

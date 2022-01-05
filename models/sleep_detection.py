@@ -69,7 +69,7 @@ def call_pose_func(assigned_pose):
 # DANCE_DETECT 함수를 호출하는 함수
 def call_dance_func():
     global YAWN_COUNTER
-    from core.views import client_socket
+    # from core.views import client_socket
 
     try:
         dance_cap = cv2.VideoCapture(0)
@@ -77,7 +77,7 @@ def call_dance_func():
         dance_cap.release()
         cv2.destroyAllWindows()
         # Call GiGA-Genie
-        client_socket.sendall("수고하셨습니다, 영상을 다시 재생합니다.".encode())
+        # client_socket.sendall("수고하셨습니다, 영상을 다시 재생합니다.".encode())
         return 0
     except:
         cv2.VideoCapture(0).release()
@@ -90,10 +90,10 @@ def sleep_detect(image):
     global BLINK_COUNT
     global YAWN_COUNTER
     global EYE_CLOSED_COUNTER
-    global client_socket
+    # global client_socket
     global STAGE
     global sy_exist
-    from core.views import client_socket
+    # from core.views import client_socket
 
     now = datetime.datetime.now()
     now = now.strftime("%H:%M:%S")
@@ -138,32 +138,32 @@ def sleep_detect(image):
         YAWN_COUNTER += 1
         if YAWN_COUNTER == 3 and STAGE == 0:
             assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
-            if assigned_pose == "Squat":
-                client_socket.sendall(("졸음 깨기 1단계를 시작합니다. 스쿼트를 3. 회 시행해주세요.").encode())
-            elif assigned_pose == "Lunge":
-                client_socket.sendall(("졸음 깨기 1단계를 시작합니다. 런지를 3. 회 시행해주세요.").encode())
+            # if assigned_pose == "Squat":
+            #     client_socket.sendall(("졸음 깨기 1단계를 시작합니다. 스쿼트를 3. 회 시행해주세요.").encode())
+            # elif assigned_pose == "Lunge":
+            #     client_socket.sendall(("졸음 깨기 1단계를 시작합니다. 런지를 3. 회 시행해주세요.").encode())
             STAGE = 1
             time.sleep(1)
             call_pose_func(assigned_pose)
 
         elif YAWN_COUNTER == 5 and STAGE == 1:
-            client_socket.sendall("졸음 깨기 2단계를 시작합니다. 음악에 맞춰 춤을 춰주세요.".encode())
+            # client_socket.sendall("졸음 깨기 2단계를 시작합니다. 음악에 맞춰 춤을 춰주세요.".encode())
             STAGE = 2
-            client_socket.sendall("123".encode())
+            # client_socket.sendall("123".encode())
             call_dance_func()
     elif int((BLINK_COUNT) / 5) == 3 and STAGE == 0:
         assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
-        if assigned_pose == "Squat":
-            client_socket.sendall(("졸음 깨기 1단계를 시작합니다. 스쿼트를 3. 회 시행해주세요.").encode())
-        elif assigned_pose == "Lunge":
-            client_socket.sendall(("졸음 깨기 1단계를 시작합니다. 런지를 3. 회 시행해주세요.").encode())
+        # if assigned_pose == "Squat":
+        #     client_socket.sendall(("졸음 깨기 1단계를 시작합니다. 스쿼트를 3. 회 시행해주세요.").encode())
+        # elif assigned_pose == "Lunge":
+        #     client_socket.sendall(("졸음 깨기 1단계를 시작합니다. 런지를 3. 회 시행해주세요.").encode())
         STAGE = 1
         time.sleep(1)
         call_pose_func(assigned_pose)
     elif int((BLINK_COUNT) / 5) == 6 and STAGE == 1:
-        client_socket.sendall("졸음 깨기 2단계를 시작합니다. 음악에 맞춰 춤을 춰주세요.".encode())
+        # client_socket.sendall("졸음 깨기 2단계를 시작합니다. 음악에 맞춰 춤을 춰주세요.".encode())
         STAGE = 2
-        client_socket.sendall("123".encode())
+        # client_socket.sendall("123".encode())
         call_dance_func()
 
 
