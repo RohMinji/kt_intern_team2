@@ -14,7 +14,7 @@ from models.sleep_detection import sleep_detect
 
 
 # Use server address. localhost
-HOST = '172.30.1.48'
+HOST = '172.30.1.26'
 
 # PORT Number
 PORT = 9999

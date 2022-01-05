@@ -167,14 +167,17 @@ def sleep_detect(image):
         elif assigned_pose == "Lunge":
             client_socket.sendall(("졸음 깨기 1단계를 시작합니다. 런지를 3. 회 시행해주세요.").encode())
         STAGE = 1
+        videoValue = 1
         time.sleep(1)
         call_pose_func(assigned_pose)
+        videoValue = 0
     elif int((BLINK_COUNT) / 5) == 6 and STAGE == 1:
+        videoValue = 1
         client_socket.sendall("졸음 깨기 2단계를 시작합니다. 음악에 맞춰 춤을 춰주세요.".encode())
         STAGE = 2
         client_socket.sendall("123".encode())
         call_dance_func()
-
+        videoValue = 0
 
 
 def get_landmarks(im):
