@@ -1,12 +1,15 @@
 import cv2
 import numpy as np
+import tensorflow as tf
 
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.resnet50 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from django.http import JsonResponse
 
-
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.allow_growth = True
+tf.compat.v1.Session(config=config)
 
 # Loading User's model
 model = load_model('models/FACE_MODEL.h5', compile=False)
