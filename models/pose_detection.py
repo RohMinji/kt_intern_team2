@@ -122,7 +122,7 @@ def pose_detect(cap, assigned_pose):
                 
                 if Time + 5 < time.time():
                     if label == "Stand":
-                        if counter == 3:
+                        if counter == 5:
                             cap.release()
                             cv2.destroyAllWindows()
                             break

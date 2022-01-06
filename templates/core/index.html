@@ -28,7 +28,7 @@
                 <p id="cam-desc">본인 화면을 확인하세요</p>
                 <img id="cam-img" src="http://127.0.0.1:8000/face-detection" alt="" srcset="">
                 <div class="mt-3" id="btn-section">
-                    <a class="btn btn-dark" href="{% url 'recognitions:course' %}" role="button" id="start-btn">강의 시작</a>
+                    <a class="btn btn-dark" href="{% url 'courses:course' %}" role="button" id="start-btn">강의 시작</a>
                 </div>
             </div>
         </div>
@@ -37,6 +37,6 @@
 </html>
 <script>
     const SY_DETECT_URL = "{% url 'core:sy_detection' %}"
-    const NEXT_URL = "{% url 'recognitions:course' %}"
+    const NEXT_URL = "{% url 'courses:course' %}"
 </script>
 <script src="{% static 'js/scripts.js' %}"></script>

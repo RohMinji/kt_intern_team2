@@ -38,7 +38,6 @@ client_socket, addr = server_socket.accept()
 print('Connected by', addr)
 """
 
-
 # Frame Generator
 def gen(camera):
     while True:
@@ -57,6 +56,7 @@ class FaceCamera(object):
     def get_frame(self):
         global SY_COUNT
         image = self.frame
+        image = cv2.flip(image, 1)
         cam = self.video
 
         # Execute Face Detection
@@ -65,7 +65,7 @@ class FaceCamera(object):
 
         # Call GiGA-Genie        
         if SY_COUNT == 100:
-            client_socket.sendall("안녕하세요 승용님, 학습을 시작하겠습니다.".encode())
+            # client_socket.sendall("안녕하세요 승용님, 학습을 시작하겠습니다.".encode())
             SY_COUNT = 101
 
         _, jpeg = cv2.imencode('.jpg', image)
@@ -93,7 +93,7 @@ class VideoCamera(object):
         global TEMP_CAP
         global TEMP_CAP2
         global YAWN_COUNTER
-        global client_socket
+        # global client_socket
         from models.sleep_detection import YAWN_COUNTER
 
         image = self.frame
