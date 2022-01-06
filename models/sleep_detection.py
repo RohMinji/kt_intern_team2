@@ -26,7 +26,7 @@ sy_exist = 0
 videoValue = 0
 
 detector = dlib.get_frontal_face_detector() # 얼굴인식
-predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat') #랜드마크 추출
+predictor = dlib.shape_predictor('models/shape_predictor_68_face_landmarks.dat') #랜드마크 추출
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rightEyeStart, rightEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
