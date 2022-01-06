@@ -38,7 +38,7 @@ mp_holistic = mp.solutions.holistic
 
 # Load Vector File of Train Data 
 temp = []
-f = open('static/ppap_keyplist.txt', 'r')
+f = open('models/ppap_keyplist.txt', 'r')
 
 while True: 
     line = f.readline()
