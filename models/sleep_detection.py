@@ -78,7 +78,7 @@ def call_dance_func():
 
     try:
         dance_cap = cv2.VideoCapture(0)
-        compare_positions('static/dance_video.mp4', dance_cap, keyp_list)
+        compare_positions('static/video/dance_video.mp4', dance_cap, keyp_list)
         dance_cap.release()
         cv2.destroyAllWindows()
         # Call GiGA-Genie
