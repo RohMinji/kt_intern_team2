@@ -10,7 +10,6 @@ import mediapipe as mp
 import random
 import json
 import time
-from models.face_detection import SY_COUNT
 
 from models.pose_detection import pose_detect
 from models.dance_detection import compare_positions
@@ -25,15 +24,19 @@ STAGE = 0
 sy_exist = 0
 videoValue = 0
 
-detector = dlib.get_frontal_face_detector() # 얼굴인식
+# Load Models for Detecting Face
+detector = dlib.get_frontal_face_detector()
+
+# Load Models for Extracting Landmarks of Face
 predictor = dlib.shape_predictor('models/shape_predictor_68_face_landmarks.dat') #랜드마크 추출
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
 (rightEyeStart, rightEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
+# Call Module for Media Pipe
 mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
 
-# txt 불러오기
+# Load Vector File of Train Data 
 temp = []
 f = open('static/ppap_keyplist.txt', 'r')
 
@@ -50,12 +53,12 @@ for i in range(len(temp)):
     keyp_list.append(list(map(int, temp[i])))
 
 
-#눈크기값dict
+# Dictionary of Eye Size
 eyesize_dic={}
-#자리비운시각dict
+# Dictionary of User's Vacancy
 empty_dic={}
 
-# POSE_DETECT 함수를 호출하는 함수
+# Call Pose Detection Function
 def call_pose_func(assigned_pose):
     try:
         cap = cv2.VideoCapture(0)
@@ -68,7 +71,7 @@ def call_pose_func(assigned_pose):
         cv2.destroyAllWindows()
         return 0
 
-# DANCE_DETECT 함수를 호출하는 함수
+# Call Dance Detection Function
 def call_dance_func():
     global YAWN_COUNTER
     # from core.views import client_socket
@@ -86,6 +89,7 @@ def call_dance_func():
         cv2.destroyAllWindows()
         return 0
 
+# Sleep Detection Function
 def sleep_detect(image):
     global YAWN_STATUS
     global grayImage
@@ -99,14 +103,18 @@ def sleep_detect(image):
 
     # from core.views import client_socket
 
+    # Collect Current Time
     now = datetime.datetime.now()
     now = now.strftime("%H:%M:%S")
     now = str(now)
 
+    # Data Preprocessing
     image_landmarks, lip_distance = mouth_open(image)
     grayImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     faces = detector(grayImage, 0)
     sy_exist = len(faces)
+
+    # Detect User's Vacancy     
     if len(faces) < 1:
         empty_dic[now] = 1
         eyesize_dic[now] = 0
@@ -116,17 +124,21 @@ def sleep_detect(image):
 
     for face in faces:
         ear= calEAR(face, image)
-        eyesize_dic[now]=1/ear
+        eyesize_dic[now] = 1 / ear
+
+        # Count Duration of User's Blink
         if ear < MINIMUM_EAR:
             EYE_CLOSED_COUNTER += 1
         else:
             EYE_CLOSED_COUNTER = 0
 
+        # Detect User's Drowsiness
         if EYE_CLOSED_COUNTER >= MAXIMUM_FRAME_COUNT:
             cv2.putText(image, "Sleep", (10, 60), cv2.FONT_HERSHEY_DUPLEX, 1.2, (0, 0, 255), 2)
             BLINK_COUNT += 1
             cv2.putText(image, "Count: {}".format(int((BLINK_COUNT) / 5)), (10, 30), cv2.FONT_HERSHEY_DUPLEX, 1.2, (0, 0, 255), 2)
     
+    # Detect User's Yawn
     prev_yawn_status = YAWN_STATUS
     if lip_distance > 25:
         YAWN_STATUS = True 
@@ -136,11 +148,12 @@ def sleep_detect(image):
                 cv2.FONT_HERSHEY_DUPLEX, 1.2, (0,255,127), 2)
     else:
         YAWN_STATUS = False 
-        
+
+    ############ Reflect Stage of Drowsiness        
     if prev_yawn_status == True and YAWN_STATUS == False:
         YAWN_COUNTER += 1
         if YAWN_COUNTER == 3 and STAGE == 0:
-            assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
+            assigned_pose = random.choice(["Squat", "Lunge"]) # select pose
             # if assigned_pose == "Squat":
             #     client_socket.sendall(("졸음 깨기 1단계를 시작합니다. 스쿼트를 3. 회 시행해주세요.").encode())
             # elif assigned_pose == "Lunge":
@@ -162,7 +175,7 @@ def sleep_detect(image):
             videoValue = 0
 
     elif int((BLINK_COUNT) / 5) == 3 and STAGE == 0:
-        assigned_pose = random.choice(["Squat", "Lunge"]) # 원하는 포즈 선택
+        assigned_pose = random.choice(["Squat", "Lunge"]) # select pose
         # if assigned_pose == "Squat":
         #     client_socket.sendall(("졸음 깨기 1단계를 시작합니다. 스쿼트를 3. 회 시행해주세요.").encode())
         # elif assigned_pose == "Lunge":
@@ -181,7 +194,7 @@ def sleep_detect(image):
         call_dance_func()
         videoValue = 0
 
-
+# Get Landmarks
 def get_landmarks(im):
     rects = detector(im, 1)
 
@@ -191,7 +204,7 @@ def get_landmarks(im):
         return "error"
     return np.matrix([[p.x, p.y] for p in predictor(im, rects[0]).parts()])
 
-
+# Get EAR of Each Eye
 def eye_aspect_ratio(eye):
     p2_minus_p6 = dist.euclidean(eye[1], eye[5])
     p3_minus_p5 = dist.euclidean(eye[2], eye[4])
@@ -199,7 +212,7 @@ def eye_aspect_ratio(eye):
     ear = (p2_minus_p6 + p3_minus_p5) / (2.0 * p1_minus_p4)
     return ear
 
-
+# Return Image with Landmarks
 def annotate_landmarks(im, landmarks):
     im = im.copy()
     for idx, point in enumerate(landmarks):
@@ -211,7 +224,7 @@ def annotate_landmarks(im, landmarks):
         cv2.circle(im, pos, 3, color=(0, 255, 255))
     return im
 
-
+# Get Points of top lip
 def top_lip(landmarks):
     top_lip_pts = []
     for i in range(50,53):
@@ -222,7 +235,7 @@ def top_lip(landmarks):
     top_lip_mean = np.mean(top_lip_pts, axis=0)
     return int(top_lip_mean[:,1])
 
-
+# Get Points of bottom lip
 def bottom_lip(landmarks):
     bottom_lip_pts = []
     for i in range(65,68):
@@ -233,7 +246,7 @@ def bottom_lip(landmarks):
     bottom_lip_mean = np.mean(bottom_lip_pts, axis=0)
     return int(bottom_lip_mean[:,1])
 
-
+# Return Lip Distance 
 def mouth_open(imagee):
     landmarks = get_landmarks(imagee)
     
@@ -246,7 +259,7 @@ def mouth_open(imagee):
     lip_distance = abs(top_lip_center - bottom_lip_center)
     return image_with_landmarks, lip_distance
 
-
+# Return Mean Value of Left & Right eye's EAR
 def calEAR(face, image):
     faceLandmarks = predictor(grayImage, face)
     faceLandmarks = face_utils.shape_to_np(faceLandmarks)
@@ -267,6 +280,7 @@ def calEAR(face, image):
     
     return ear
 
+# Course Video Stop Control 
 def videoStop(request):
     global videoValue
     global sy_exist
