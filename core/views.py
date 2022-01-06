@@ -12,7 +12,7 @@ from django.http import StreamingHttpResponse
 from models.face_detection import SY_COUNT, face_detect, sy_detection
 from models.sleep_detection import sleep_detect
 
-
+"""
 # Use server address. localhost
 HOST = '172.30.1.26'
 
@@ -36,7 +36,7 @@ client_socket, addr = server_socket.accept()
 
 # Client Address
 print('Connected by', addr)
-
+"""
 
 # Frame Generator
 def gen(camera):
@@ -65,7 +65,7 @@ class FaceCamera(object):
 
         # Call GiGA-Genie        
         if SY_COUNT == 100:
-            client_socket.sendall("안녕하세요 승용님, 학습을 시작하겠습니다.".encode())
+            # client_socket.sendall("안녕하세요 승용님, 학습을 시작하겠습니다.".encode())
             SY_COUNT = 101
 
         _, jpeg = cv2.imencode('.jpg', image)
@@ -93,7 +93,7 @@ class VideoCamera(object):
         global TEMP_CAP
         global TEMP_CAP2
         global YAWN_COUNTER
-        global client_socket
+        # global client_socket
         from models.sleep_detection import YAWN_COUNTER
 
         image = self.frame
