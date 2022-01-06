@@ -1,7 +1,7 @@
 # 💤 졸음퇴치를 위한 AI 학습 도우미
 #### 의지가 부족한 수강생을 위해! 집중도 높은 학습을 독려하기 위해! 완벽한 학습률을 성취하기 위해! 👊
 ### 📚잠들기 2초전과 함께하는 온라인 학습📚
-@[곽내원](https://github.com/KwakNW) @김민솔 @김성훈 @김지태 @[노민지](https://github.com/RohMinji) @박석빈 
+@[곽내원](https://github.com/KwakNW) @김민솔 @김성훈 @김지태 @[노민지](https://github.com/RohMinji) 
 @[박석빈](https://github.com/sbsbpark) @박주영 @[유보미](https://github.com/Ubomi) @주승용 @[주한별](https://github.com/hbgittt) @[최인지](https://github.com/InjiChoi)
 
 </br></br>
